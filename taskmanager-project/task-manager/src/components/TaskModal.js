@@ -6,17 +6,22 @@ function TaskModal({ onClose, onTaskCreated }) {
   const [deadline, setDeadline] = useState("");
   const [assigneeId, setAssigneeId] = useState("");
   const [employees, setEmployees] = useState([]);
+  const [user, setUser] = useState(null);
 
-  // Load employees for dropdown
-  // useEffect(() => {
-  //   fetch("http://localhost:8080/api/employees")
-  //     .then(res => res.json())
-  //     .then(data => setEmployees(data));
-  // }, []);
 
   useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  }
+}, []);
+
+
+useEffect(() => {
+  if (!user?.user_id) return; // ⛔ wait for logged-in user
+
   fetch(
-    "https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=GLET100056"
+    `https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${user.user_id}`
   )
     .then(res => res.json())
     .then(json => {
@@ -30,44 +35,9 @@ function TaskModal({ onClose, onTaskCreated }) {
       console.error("Failed to load employees", err);
       setEmployees([]);
     });
-}, []);
+}, [user]); // ✅ dependency
 
 
-//   const handleSave = async () => {
-//   // Format deadline for MySQL DATETIME: 'YYYY-MM-DD HH:MM:SS'
-// //   const formattedDeadline = deadline ? deadline.replace("T", " ") + ":00" : null;
-
-//   // Match column names in MySQL
-//   const taskData = {
-//     task_name: taskName,
-//     description: description,
-//     assignee_id: assigneeId ? Number(assigneeId) : null,
-//     deadline: deadline,
-//     // created_date: "",
-//     // status: "PENDING"
-//   };
-
-//   try {
-//     const response = await fetch("http://localhost:8080/api/tasks", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify(taskData),
-//     });
-
-//     if (!response.ok) {
-//       const errorText = await response.text();
-//       console.error("Failed to save task:", errorText);
-//       alert("Failed to save task. See console for details.");
-//       return;
-//     }
-
-//     onTaskCreated();
-//     onClose();
-//   } catch (err) {
-//     console.error("Error saving task:", err);
-//     alert("An error occurred while saving the task.");
-//   }
-// };
 
 const handleSave = async () => {
 

@@ -43,55 +43,40 @@ useEffect(() => {
 }, [user]); // ✅ runs when user changes
 
 
-//   useEffect(() => {
-//     const loggedInUserId = user?.emp_pkey;
-//   const loadFeeds = async () => {
-//     try {
-        
-//       const empId = loggedInUserId; // same temp user as backend
-      
-//       const res = await fetch(`http://localhost:8080/api/feeds/employee/${empId}`);
-//       const data = await res.json();
-//       setFeeds(Array.isArray(data) ? data : []);
-//     } catch (e) {
-//       console.error("Feed load failed", e);
-//       setFeeds([]);
-//     }
-//   };
-
-//   loadFeeds();
-// }, []);
-
-
   // Fetch employees
+
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const res = await fetch(
-          "https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=GLET100056"
-        );
-        const json = await res.json();
+  if (!user?.user_id) return; // ⛔ wait until user is ready
 
-        if (json.success === 1 && Array.isArray(json.data)) {
-          const normalized = json.data
-            .map(emp => ({
-              id: emp.emp_pkey,
-              fullName: emp.EmpName?.trim()
-            }))
-            .filter(emp => emp.fullName && emp.fullName !== "");
+  const fetchEmployees = async () => {
+    try {
+      const res = await fetch(
+        `https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${user.user_id}`
+      );
 
-          setEmployees(normalized);
-        } else {
-          setEmployees([]);
-        }
-      } catch (err) {
-        console.error("Fetch error:", err);
+      const json = await res.json();
+
+      if (json.success === 1 && Array.isArray(json.data)) {
+        const normalized = json.data
+          .map(emp => ({
+            id: emp.emp_pkey,
+            fullName: emp.EmpName?.trim()
+          }))
+          .filter(emp => emp.fullName);
+
+        setEmployees(normalized);
+      } else {
         setEmployees([]);
       }
-    };
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setEmployees([]);
+    }
+  };
 
-    fetchEmployees();
-  }, []);
+  fetchEmployees();
+}, [user]); // ✅ dependency
+
 
   // Add recipient
   const addRecipient = (emp) => {
