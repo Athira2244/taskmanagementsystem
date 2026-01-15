@@ -28,6 +28,9 @@ public class EmpTaskTime {
     @Column(name = "duration_minutes", nullable = false)
     private Integer durationMinutes;
 
+    @Column(name = "comment", nullable = false)
+    private String comment;
+
     @Column(name = "created_date")
     private LocalDateTime createdDate = LocalDateTime.now();
 
@@ -71,5 +74,13 @@ public class EmpTaskTime {
 
     public void setDurationMinutes(Integer durationMinutes) {
         this.durationMinutes = durationMinutes;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

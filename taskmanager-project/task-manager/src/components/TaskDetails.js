@@ -341,7 +341,8 @@ function TaskDetails({ task, onClose ,onStatusChange}) {
     setNewEntry({
       startTime: now,
       endTime: "",
-      durationMinutes: 0
+      durationMinutes: 0,
+      comment:""
     });
   };
 
@@ -358,7 +359,8 @@ function TaskDetails({ task, onClose ,onStatusChange}) {
       taskFkey: task.id,
       startTime: newEntry.startTime,
       endTime: newEntry.endTime,
-      durationMinutes: duration
+      durationMinutes: duration,
+      comment :newEntry.comment
     };
 
     await fetch("http://localhost:8080/api/emp_task_time", {
@@ -454,6 +456,7 @@ function TaskDetails({ task, onClose ,onStatusChange}) {
               <th>Start</th>
               <th>End</th>
               <th>Duration (min)</th>
+              <th>Comments</th>
               <th></th>
             </tr>
           </thead>
@@ -463,11 +466,12 @@ function TaskDetails({ task, onClose ,onStatusChange}) {
                 <td>{t.startTime}</td>
                 <td>{t.endTime}</td>
                 <td>{t.durationMinutes}</td>
+                <td>{t.comment}</td>
                 <td></td>
               </tr>
             ))}
 
-            {newEntry && (
+            {/* {newEntry && (
               <tr>
                 <td><input type="datetime-local" value={newEntry.startTime} readOnly /></td>
                 <td>
@@ -480,7 +484,55 @@ function TaskDetails({ task, onClose ,onStatusChange}) {
                 <td>{calculateDuration(newEntry.startTime, newEntry.endTime)}</td>
                 <td><button onClick={handleSaveTime}>Save</button></td>
               </tr>
-            )}
+            )} */}
+
+            {newEntry && (
+  <tr>
+    <td>
+      <input
+        type="datetime-local"
+        value={newEntry.startTime}
+        readOnly
+      />
+    </td>
+
+    <td>
+      <input
+        type="datetime-local"
+        value={newEntry.endTime}
+        onChange={(e) =>
+          setNewEntry({ ...newEntry, endTime: e.target.value })
+        }
+      />
+    </td>
+
+    <td>
+      {calculateDuration(newEntry.startTime, newEntry.endTime)}
+    </td>
+
+    <td>
+      <input
+        type="text"
+        placeholder="Enter work comment"
+        value={newEntry.comment}
+        onChange={(e) =>
+          setNewEntry({ ...newEntry, comment: e.target.value })
+        }
+        style={{ width: "100%" }}
+      />
+    </td>
+
+    <td>
+      <button
+        onClick={handleSaveTime}
+        disabled={!newEntry.endTime || !newEntry.comment.trim()}
+      >
+        Save
+      </button>
+    </td>
+  </tr>
+)}
+
           </tbody>
         </table>
 

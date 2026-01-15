@@ -16,6 +16,8 @@ public class EmpTaskTimeRequest {
 
     private Integer durationMinutes;
 
+    private String comment;
+
     // getters & setters
 
     public Integer getEmpFkey() {
@@ -56,5 +58,13 @@ public class EmpTaskTimeRequest {
 
     public void setDurationMinutes(Integer durationMinutes) {
         this.durationMinutes = durationMinutes;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
