@@ -1,12 +1,13 @@
+
+
 import React, { useState } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import Dashboard from "./Dashboard";
 import Feed from "./Feed";
+import Profile from "./Profile";
 
-// import Messages from "./Messages";
-
-function Layout() {
+function Layout({ onLogout }) {
   const [page, setPage] = useState("dashboard");
 
   const renderPage = () => {
@@ -14,7 +15,12 @@ function Layout() {
       case "messages":
         return <Feed />;
       case "tasks":
-        return <Dashboard />; // reuse or new component
+        return <Dashboard />;
+      case "profile":
+  return <Profile onBack={() => setPage("dashboard")} onLogout={() => window.location.reload()} />;
+
+
+      
       default:
         return <Dashboard />;
     }
@@ -22,15 +28,14 @@ function Layout() {
 
   return (
     <div className="layout">
-      <Navbar />
+      <Navbar onProfileClick={() => setPage("profile")} />
       <div className="content-area">
         <Sidebar active={page} onNavigate={setPage} />
-        <div className="main-content">
-          {renderPage()}
-        </div>
+        <div className="main-content">{renderPage()}</div>
       </div>
     </div>
   );
 }
 
 export default Layout;
+
