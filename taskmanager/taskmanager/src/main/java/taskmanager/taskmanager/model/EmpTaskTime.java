@@ -28,7 +28,7 @@ public class EmpTaskTime {
     @Column(name = "duration_minutes", nullable = false)
     private Integer durationMinutes;
 
-    @Column(name = "comment", nullable = false)
+    @Column(name = "comment")
     private String comment;
 
     @Column(name = "created_date")

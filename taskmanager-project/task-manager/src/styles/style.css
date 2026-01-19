@@ -449,23 +449,6 @@ input:focus {
   min-width: 190px;
 }
 
-/* time modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.modal-box {
-  background: #fff;
-  padding: 24px;
-  width: 420px;
-  border-radius: 8px;
-}
 
 
 .navbar-right{
@@ -476,4 +459,16 @@ input:focus {
 
 .profile-pic{
   width:7%;
+}
+
+
+/* overdue */
+.overdue-task {
+  background-color: #ffe6e6;
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.overdue-task:hover {
+  background-color: #ffcccc;
 }

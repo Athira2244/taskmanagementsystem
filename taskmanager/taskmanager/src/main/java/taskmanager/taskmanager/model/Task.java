@@ -16,10 +16,10 @@ public class Task {
 
     private String status;
     
-    @Column(name = "attachment")
+    // @Column(name = "attachment")
     private String attachment;
 
-    @Column(name = "task_name")
+    // @Column(name = "task_name")
     private String taskName;
 
     private String description;
@@ -34,8 +34,10 @@ public class Task {
     private Integer assigneeId;
 
     @Column(name = "EmpName")
-    private String EmpName;       // EmpName from API
+    private String empName;       // EmpName from API
 
+    @Column(name = "is_assignee")
+    private Integer isAssignee = 1;  // 1 = current assignee, 0 = reassigned
 
     // getters & setters
     public Long getId() { return id; }
@@ -49,8 +51,8 @@ public class Task {
     public LocalDateTime getDeadline() { return deadline; }
     public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
 
-    public String getEmpName() { return EmpName; }
-    public void setEmpName(String EmpName) { this.EmpName = EmpName; }
+    public String getEmpName() { return empName; }
+    public void setEmpName(String empName) { this.empName = empName; }
 
     // public Employee getAssignee() { return assignee; }
     // public void setAssignee(Employee assignee) { this.assignee = assignee; }
@@ -69,4 +71,7 @@ public class Task {
 
     public String getAttachment() { return attachment; }
     public void setAttachment(String attachment) { this.attachment = attachment; }
+
+    public Integer getIsAssignee() { return isAssignee; }
+    public void setIsAssignee(Integer isAssignee) { this.isAssignee = isAssignee; }
 }

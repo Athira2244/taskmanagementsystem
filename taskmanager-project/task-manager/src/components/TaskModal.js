@@ -10,75 +10,75 @@ function TaskModal({ onClose, onTaskCreated }) {
 
 
   useEffect(() => {
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    setUser(JSON.parse(storedUser));
-  }
-}, []);
-
-
-useEffect(() => {
-  if (!user?.user_id) return; // ⛔ wait for logged-in user
-
-  fetch(
-    `https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${user.user_id}`
-  )
-    .then(res => res.json())
-    .then(json => {
-      if (json.success === 1) {
-        setEmployees(json.data);
-      } else {
-        setEmployees([]);
-      }
-    })
-    .catch(err => {
-      console.error("Failed to load employees", err);
-      setEmployees([]);
-    });
-}, [user]); // ✅ dependency
-
-
-
-const handleSave = async () => {
-
-  // find selected employee object
-  const selectedEmployee = employees.find(
-    emp => String(emp.emp_pkey) === String(assigneeId)
-  );
-
-
-  
-  const taskData = {
-    task_name: taskName,
-    description: description,
-    assignee_id: assigneeId ? Number(assigneeId) : null,
-    EmpName: selectedEmployee ? selectedEmployee.EmpName : "",
-    deadline: deadline
-  };
-
- 
-
-  try {
-    const response = await fetch("http://localhost:8080/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(taskData),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Failed to save task:", errorText);
-      alert("Failed to save task. See console for details.");
-      return;
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
+  }, []);
 
-    onTaskCreated();
-    onClose();
-  } catch (err) {
-    console.error("Error saving task:", err);
-    alert("An error occurred while saving the task.");
-  }
-};
+
+  useEffect(() => {
+    if (!user?.user_id) return; // ⛔ wait for logged-in user
+
+    fetch(
+      `https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${user.user_id}`
+    )
+      .then(res => res.json())
+      .then(json => {
+        if (json.success === 1) {
+          setEmployees(json.data);
+        } else {
+          setEmployees([]);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load employees", err);
+        setEmployees([]);
+      });
+  }, [user]); // ✅ dependency
+
+
+
+  const handleSave = async () => {
+
+    // find selected employee object
+    const selectedEmployee = employees.find(
+      emp => String(emp.emp_pkey) === String(assigneeId)
+    );
+
+
+
+    const taskData = {
+      taskName: taskName,
+      description: description,
+      assigneeId: assigneeId ? Number(assigneeId) : null,
+      empName: selectedEmployee ? selectedEmployee.EmpName : "",
+      deadline: deadline
+    };
+
+
+
+    try {
+      const response = await fetch("http://localhost:8080/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(taskData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Failed to save task:", errorText);
+        alert("Failed to save task. See console for details.");
+        return;
+      }
+
+      onTaskCreated();
+      onClose();
+    } catch (err) {
+      console.error("Error saving task:", err);
+      alert("An error occurred while saving the task.");
+    }
+  };
 
 
   return (
@@ -105,14 +105,14 @@ const handleSave = async () => {
           onChange={e => setDeadline(e.target.value)}
         />
 
-       <select value={assigneeId} onChange={e => setAssigneeId(e.target.value)}>
-  <option value="">Select Assignee</option>
-  {employees.map(emp => (
-    <option key={emp.emp_pkey} value={emp.emp_pkey}>
-      {emp.EmpName}
-    </option>
-  ))}
-</select>
+        <select value={assigneeId} onChange={e => setAssigneeId(e.target.value)}>
+          <option value="">Select Assignee</option>
+          {employees.map(emp => (
+            <option key={emp.emp_pkey} value={emp.emp_pkey}>
+              {emp.EmpName}
+            </option>
+          ))}
+        </select>
 
 
         <div className="modal-actions">

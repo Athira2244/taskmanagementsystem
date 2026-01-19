@@ -1,35 +1,3 @@
-// import com.fasterxml.jackson.annotation.JsonFormat;
-// import java.time.LocalDateTime;
-
-// public class TaskRequest {
-
-//     private String taskName;
-//     private String description;
-
-//     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-//     private LocalDateTime deadline;
-
-//     private Integer assigneeId;
-
-//     // getters & setters
-// }
-
-// package taskmanager.taskmanager.dto;
-
-// import com.fasterxml.jackson.annotation.JsonFormat;
-// import java.time.LocalDateTime;
-
-// public class TaskRequest {
-//     private String taskName;
-//     private String description;
-
-//     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-//     private LocalDateTime deadline;
-
-//     private Integer assigneeId;
-
-//     // getters & setters
-// }
 
 
 package taskmanager.taskmanager.dto;
@@ -41,22 +9,22 @@ import java.time.LocalDateTime;
 
 public class TaskRequest {
 
-    @JsonProperty("task_name")
+    @JsonProperty("taskName")
     private String taskName;
+    
+    @JsonProperty("description")
     private String description;
 
+    @JsonProperty("status")
     private String status;
     
-
-
-
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime deadline;
 
-    @JsonProperty("EmpName")
-    private String EmpName;
+    @JsonProperty("empName")
+    private String empName;
 
-    @JsonProperty("assignee_id")
+    @JsonProperty("assigneeId")
     private Integer assigneeId;
 
     // ✅ Getters
@@ -65,10 +33,7 @@ public class TaskRequest {
     public LocalDateTime getDeadline() { return deadline; }
     public Integer getAssigneeId() { return assigneeId; }
     public String getStatus() { return status; }
-     public String getEmpName() { return EmpName; }
-    
-    // public String getAttachment() { return attachment; }
-
+    public String getEmpName() { return empName; }
 
     // ✅ Setters
     public void setTaskName(String taskName) { this.taskName = taskName; }
@@ -76,7 +41,7 @@ public class TaskRequest {
     public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
     public void setAssigneeId(Integer assigneeId) { this.assigneeId = assigneeId; }
     public void setStatus(String status) { this.status = status; }
-     public void setEmpName(String EmpName) { this.EmpName = EmpName; }
+    public void setEmpName(String empName) { this.empName = empName; }
     // public void setAttachment(String attachment) { this.attachment = attachment; }
 }
 
