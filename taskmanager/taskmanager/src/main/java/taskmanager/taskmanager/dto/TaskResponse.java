@@ -37,6 +37,12 @@ public class TaskResponse {
     @JsonProperty("isAssignee")
     private Integer isAssignee;
 
+    @JsonProperty("createdBy")
+    private Integer createdBy;
+
+    @JsonProperty("createdByName")
+    private String createdByName;
+
     // Constructors
     public TaskResponse() {}
 
@@ -127,5 +133,21 @@ public class TaskResponse {
 
     public void setIsAssignee(Integer isAssignee) {
         this.isAssignee = isAssignee;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getCreatedByName() {
+        return createdByName;
+    }
+
+    public void setCreatedByName(String createdByName) {
+        this.createdByName = createdByName;
     }
 }

@@ -31,6 +31,20 @@ function TaskDetails({ task, onClose, onStatusChange }) {
       });
   }, []);
 
+  // Ensure current user is in the list
+  const user = JSON.parse(localStorage.getItem("user"));
+  const allEmployees = React.useMemo(() => {
+    if (!user || !user.emp_pkey) return employees;
+    const exists = employees.find(e => Number(e.emp_pkey) === Number(user.emp_pkey));
+    if (!exists) {
+      return [...employees, {
+        emp_pkey: user.emp_pkey,
+        EmpName: user.employee_name || "Myself"
+      }];
+    }
+    return employees;
+  }, [employees]);
+
   // Helper function to get employee name by ID
   const getEmployeeName = (assigneeId) => {
     if (!assigneeId) return "Unassigned";
@@ -100,7 +114,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
       const taskIdToUpdate = task.taskId || task.id;
 
       // Find the selected employee name for the CURRENTLY selected assigneeId in the form
-      const selectedEmployee = employees.find(e => Number(e.emp_pkey) === Number(form.assigneeId));
+      const selectedEmployee = allEmployees.find(e => Number(e.emp_pkey) === Number(form.assigneeId));
       const empName = selectedEmployee?.EmpName?.trim() || task.empName || '';
 
       console.log('Selected employee for save:', selectedEmployee);
@@ -203,6 +217,9 @@ function TaskDetails({ task, onClose, onStatusChange }) {
             <span>{task.taskName}</span>
           )}
 
+          <label>Created By</label>
+          <span>{task.createdByName || getEmployeeName(task.createdBy)}</span>
+
           <label>Assignee</label>
           {isEdit ? (
 
@@ -214,7 +231,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
             >
               <option value="">Select assignee</option>
 
-              {employees.map(emp => (
+              {allEmployees.map(emp => (
                 <option key={emp.emp_pkey} value={emp.emp_pkey}>
                   {emp.EmpName}
                 </option>
@@ -321,6 +338,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
                 </td>
                 <td>
                   <button
+                    className="btn-primary"
                     onClick={saveTime}
                     disabled={!newEntry.endTime || !newEntry.comment}
                   >

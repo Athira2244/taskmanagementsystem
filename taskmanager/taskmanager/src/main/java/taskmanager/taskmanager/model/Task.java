@@ -16,7 +16,7 @@ public class Task {
 
     private String status;
     
-    // @Column(name = "attachment")
+    @Column(name = "attachment")
     private String attachment;
 
     // @Column(name = "task_name")
@@ -39,6 +39,12 @@ public class Task {
     @Column(name = "is_assignee")
     private Integer isAssignee = 1;  // 1 = current assignee, 0 = reassigned
 
+    @Column(name = "created_by")
+    private Integer createdBy;
+
+    @Column(name = "created_by_name")
+    private String createdByName;
+
     // getters & setters
     public Long getId() { return id; }
 
@@ -53,6 +59,12 @@ public class Task {
 
     public String getEmpName() { return empName; }
     public void setEmpName(String empName) { this.empName = empName; }
+
+    public Integer getCreatedBy() { return createdBy; }
+    public void setCreatedBy(Integer createdBy) { this.createdBy = createdBy; }
+
+    public String getCreatedByName() { return createdByName; }
+    public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
 
     // public Employee getAssignee() { return assignee; }
     // public void setAssignee(Employee assignee) { this.assignee = assignee; }

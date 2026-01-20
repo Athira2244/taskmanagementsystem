@@ -24,8 +24,14 @@ public class TaskRequest {
     @JsonProperty("empName")
     private String empName;
 
+    @JsonProperty("createdBy")
+    private Integer createdBy;
+
     @JsonProperty("assigneeId")
     private Integer assigneeId;
+
+    @JsonProperty("createdByName")
+    private String createdByName;
 
     // ✅ Getters
     public String getTaskName() { return taskName; }
@@ -34,6 +40,8 @@ public class TaskRequest {
     public Integer getAssigneeId() { return assigneeId; }
     public String getStatus() { return status; }
     public String getEmpName() { return empName; }
+    public Integer getCreatedBy() { return createdBy; }
+    public String getCreatedByName() { return createdByName; }
 
     // ✅ Setters
     public void setTaskName(String taskName) { this.taskName = taskName; }
@@ -42,6 +50,8 @@ public class TaskRequest {
     public void setAssigneeId(Integer assigneeId) { this.assigneeId = assigneeId; }
     public void setStatus(String status) { this.status = status; }
     public void setEmpName(String empName) { this.empName = empName; }
+    public void setCreatedBy(Integer createdBy) { this.createdBy = createdBy; }
+    public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
     // public void setAttachment(String attachment) { this.attachment = attachment; }
 }
 

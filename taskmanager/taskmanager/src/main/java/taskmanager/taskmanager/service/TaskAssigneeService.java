@@ -46,6 +46,8 @@ public class TaskAssigneeService {
             response.setAttachment(task.getAttachment());
             response.setSource("tasks");
             response.setIsAssignee(1);
+            response.setCreatedBy(task.getCreatedBy());
+            response.setCreatedByName(task.getCreatedByName());
             result.add(response);
         }
 
@@ -69,6 +71,8 @@ public class TaskAssigneeService {
                 response.setAttachment(parentTask.getAttachment());
                 response.setSource("task_assignees");
                 response.setIsAssignee(ta.getIsAssignee());
+                response.setCreatedBy(parentTask.getCreatedBy());
+                response.setCreatedByName(parentTask.getCreatedByName());
                 result.add(response);
             }
         }

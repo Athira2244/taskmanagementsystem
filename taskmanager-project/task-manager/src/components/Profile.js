@@ -8,55 +8,83 @@ function Profile({ onBack, onLogout }) {
     localStorage.clear();
     onLogout();
   };
-  
 
-  // Helper function to format date
-const formatDate = (dateString) => {
-  if (!dateString) return "-"; // handle empty/null dates
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-};
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
   return (
-    <div className="profile-container">
-      {/* Heading */}
-      <h1 className="profile-heading">My Profile</h1>
-
-      {/* Main content: image + details */}
-      <div className="profile-main">
-        {/* Image */}
-        <img
-          src={user?.profile_pic || "/istockphoto-2132177453-170667a.jpg"}
-          alt="Profile"
-          className="profile-image-large"
-          onError={(e) => (e.target.src = "/istockphoto-2132177453-170667a.jpg")}
-        />
-        
-
-        
-
-        {/* Details */}
-        <div className="profile-details">
-          <h2>{user?.employee_name || "Employee"}</h2>
-          <p><b>Employee ID:</b> {user?.user_id}</p>
-          <p><b>Department:</b> {user?.department}</p>
-          <p><b>Designation:</b> {user?.designation}</p>
-          <p><b>Date of Birth:</b> {formatDate(user?.date_of_birth)}</p>
-          <p><b>Date of Joining:</b> {formatDate(user?.joining_date)}</p>
-        </div>
+    <div className="profile-pro-container">
+      <div className="profile-header-v2">
+        <button className="back-link" onClick={onBack}>
+          ← Back to Dashboard
+        </button>
+        <h1>Employee Profile</h1>
       </div>
 
-      {/* Buttons */}
-      <div className="profile-buttons">
-        <button className="profile-back-btn" onClick={onBack}>
-          ← Back
-        </button>
-        <button className="btn-logout" onClick={handleLogout}>
-          Logout
-        </button>
+      <div className="profile-grid">
+        {/* Left Side: Quick Info Card */}
+        <div className="profile-sidebar-card">
+          <div className="profile-avatar-wrapper">
+            <img
+              src={user?.profile_pic || "/istockphoto-2132177453-170667a.jpg"}
+              alt="Profile"
+              className="profile-avatar-large"
+              onError={(e) => (e.target.src = "/istockphoto-2132177453-170667a.jpg")}
+            />
+            <div className="status-indicator online">Online</div>
+          </div>
+
+          <h2 className="profile-user-name">{user?.employee_name || "Employee"}</h2>
+          <p className="profile-user-id">ID: {user?.user_id}</p>
+
+          <div className="profile-quick-actions">
+            <button className="btn-logout-v2" onClick={handleLogout}>
+              Sign Out
+            </button>
+          </div>
+        </div>
+
+        {/* Right Side: Detailed Info Card */}
+        <div className="profile-details-card">
+          <div className="details-section">
+            <div className="section-title">Career Information</div>
+            <div className="details-grid">
+              <div className="info-group">
+                <label>Department</label>
+                <span>{user?.department || "Unassigned"}</span>
+              </div>
+              <div className="info-group">
+                <label>Designation</label>
+                <span>{user?.designation || "Unassigned"}</span>
+              </div>
+              <div className="info-group">
+                <label>Date of Joining</label>
+                <span>{formatDate(user?.joining_date)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="details-section">
+            <div className="section-title">Personal Details</div>
+            <div className="details-grid">
+              <div className="info-group">
+                <label>Date of Birth</label>
+                <span>{formatDate(user?.date_of_birth)}</span>
+              </div>
+              <div className="info-group">
+                <label>Email Address</label>
+                <span>{user?.user_email || "N/A"}</span>
+              </div>
+              {/* Add more fields as needed */}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

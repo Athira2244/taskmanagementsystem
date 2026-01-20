@@ -35,14 +35,27 @@ function TaskModal({ onClose, onTaskCreated }) {
         console.error("Failed to load employees", err);
         setEmployees([]);
       });
-  }, [user]); // ✅ dependency
+  }, [user]);
+
+  // Ensure current user is in the list
+  const allEmployees = React.useMemo(() => {
+    if (!user || !user.emp_pkey) return employees;
+    const exists = employees.find(e => Number(e.emp_pkey) === Number(user.emp_pkey));
+    if (!exists) {
+      return [...employees, {
+        emp_pkey: user.emp_pkey,
+        EmpName: user.employee_name || "Myself"
+      }];
+    }
+    return employees;
+  }, [employees, user]);
 
 
 
   const handleSave = async () => {
 
     // find selected employee object
-    const selectedEmployee = employees.find(
+    const selectedEmployee = allEmployees.find(
       emp => String(emp.emp_pkey) === String(assigneeId)
     );
 
@@ -53,10 +66,12 @@ function TaskModal({ onClose, onTaskCreated }) {
       description: description,
       assigneeId: assigneeId ? Number(assigneeId) : null,
       empName: selectedEmployee ? selectedEmployee.EmpName : "",
-      deadline: deadline
+      deadline: deadline,
+      createdBy: Number(user?.emp_pkey || user?.user_id), // Force Number
+      createdByName: user?.employee_name || "Unknown"
     };
 
-
+    console.log("Saving Task Payload:", taskData);
 
     try {
       const response = await fetch("http://localhost:8080/api/tasks", {
@@ -107,17 +122,28 @@ function TaskModal({ onClose, onTaskCreated }) {
 
         <select value={assigneeId} onChange={e => setAssigneeId(e.target.value)}>
           <option value="">Select Assignee</option>
-          {employees.map(emp => (
+          {allEmployees.map(emp => (
             <option key={emp.emp_pkey} value={emp.emp_pkey}>
               {emp.EmpName}
             </option>
           ))}
         </select>
 
+        <div className="form-group" style={{ marginBottom: "15px" }}>
+          <label style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "5px" }}>
+            Created By
+          </label>
+          <input
+            value={user?.employee_name || "Myself"}
+            disabled
+            style={{ background: "#f1f5f9", color: "#64748b", cursor: "not-allowed" }}
+          />
+        </div>
+
 
         <div className="modal-actions">
-          <button onClick={onClose}>Cancel</button>
-          <button onClick={handleSave}>Save Task</button>
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn-primary" onClick={handleSave}>Save Task</button>
         </div>
       </div>
     </div>

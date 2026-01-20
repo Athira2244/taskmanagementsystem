@@ -38,7 +38,9 @@ public class TaskController {
         task.setDeadline(request.getDeadline());
         task.setStatus("PENDING");
         task.setAssigneeId(request.getAssigneeId());
-         task.setEmpName(request.getEmpName());       // EmpName
+        task.setEmpName(request.getEmpName());       // EmpName
+        task.setCreatedBy(request.getCreatedBy());
+        task.setCreatedByName(request.getCreatedByName());
 
         // Employee employee = new Employee();
         // employee.setEmployeeId(request.getAssigneeId());
@@ -46,7 +48,7 @@ public class TaskController {
 
 // System.out.println("DEBUG EmpName = [" + request.getEmpName() + "]");
 // System.out.println("DEBUG AssigneeId = [" + request.getAssigneeId() + "]");
-
+        System.out.println("DEBUG CreatedBy received: " + request.getCreatedBy());
 
         return taskRepository.save(task);
     }

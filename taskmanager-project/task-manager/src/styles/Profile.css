@@ -1,87 +1,169 @@
-/* Full page container */
-.profile-container {
+.profile-pro-container {
   width: 100%;
+  padding: 40px;
+  background: var(--bg-main);
   min-height: 100vh;
-  padding: 40px 60px;
   box-sizing: border-box;
-  background: #f6f7fb;
+}
+
+.profile-header-v2 {
+  margin-bottom: 35px;
+}
+
+.back-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 15px;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-link:hover {
+  color: var(--primary);
+}
+
+.profile-header-v2 h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1b1e24;
+  margin: 0;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* Sidebar Card */
+.profile-sidebar-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 54px 30px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 40px;
+  align-items: center;
+  text-align: center;
 }
 
-/* Heading */
-.profile-heading {
-  font-size: 28px;
-  color: #333;
+.profile-avatar-wrapper {
+  position: relative;
+  margin-bottom: 25px;
 }
 
-/* Main content: Image + Details */
-.profile-main {
-  display: flex;
-  align-items: flex-start;
-  gap: 40px;
-}
-
-/* Profile image */
-.profile-image-large {
-  width: 150px;
-  height: 150px;
+.profile-avatar-large {
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #eee;
+  border: 5px solid #fff;
+  box-shadow: 0 0 0 1px var(--border);
 }
 
-/* Details */
-.profile-details {
+.status-indicator {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: var(--success);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 3px solid #fff;
+  text-transform: uppercase;
+}
+
+.profile-user-name {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 8px 0;
+}
+
+.profile-user-id {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0 0 30px 0;
+  font-weight: 600;
+}
+
+.btn-logout-v2 {
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  color: var(--danger);
+  border: 1px solid #fee2e2;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-logout-v2:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+/* Details Card */
+.profile-details-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  font-size: 16px;
-  color: #444;
+  gap: 40px;
 }
 
-.profile-details h2 {
-  margin: 0 0 10px 0;
-  font-size: 22px;
+.details-section {
+  width: 100%;
 }
 
-.profile-details p {
-  margin: 5px 0;
+.section-title {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f8fafc;
 }
 
-/* Buttons row */
-.profile-buttons {
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.info-group {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Back button */
-.profile-back-btn {
-  padding: 10px 20px;
-  background: #3498db;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
+.info-group label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.profile-back-btn:hover {
-  background: #2980b9;
-}
-
-/* Logout button */
-.btn-logout {
-  padding: 10px 20px;
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn-logout:hover {
-  background: #c0392b;
+.info-group span {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
 }

@@ -148,6 +148,7 @@ function Dashboard() {
               <th>Task</th>
               <th>Description</th>
               <th>Assignee</th>
+              <th>Created By</th>
               <th>Deadline</th>
               <th>Status</th>
             </tr>
@@ -171,6 +172,7 @@ function Dashboard() {
                   <td>{task.taskName}</td>
                   <td>{task.description}</td>
                   <td>{task.empName || getEmployeeName(task.assigneeId)}</td>
+                  <td>{task.createdByName || getEmployeeName(task.createdBy)}</td>
                   <td>{task.deadline}</td>
                   <td>{task.status}</td>
                 </tr>

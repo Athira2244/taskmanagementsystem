@@ -284,34 +284,35 @@ function Feed() {
         </div>
       </div>
       {/* FEEDS LIST */}
-      <div style={{ marginTop: "20px" }}>
+      <div className="feeds-list">
         {feeds.length === 0 ? (
-          <p>No feeds available</p>
+          <div className="placeholder-content">
+            <h3>No feeds available</h3>
+            <p>Your team's updates will appear here.</p>
+          </div>
         ) : (
           feeds.map(feed => (
             <div
               key={feed.feedId}
               className={`feed-item ${feed.isAnnouncement === 1 ? 'announcement-feed' : ''}`}
-              style={{
-                background: feed.isAnnouncement === 1 ? "#fff9e6" : "#fff",
-                border: feed.isAnnouncement === 1 ? "1px solid #ffd700" : "1px solid #ddd",
-                padding: "10px",
-                marginBottom: "10px",
-                borderRadius: "6px"
-              }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#888" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "var(--text-muted)", marginBottom: "8px" }}>
                 <span>
                   {feed.isAnnouncement === 1 ? (
-                    <strong style={{ color: "#d4a017" }}>ANNOUNCEMENT</strong>
+                    <strong style={{ color: "var(--warning)" }}>ANNOUNCEMENT</strong>
                   ) : (
-                    feed.isGlobal ? "All Employees" : "Assigned to you"
-                  )} ·{" "}
+                    feed.isGlobal ? (
+                      <span style={{ fontWeight: "600", color: "var(--primary)" }}>All Employees</span>
+                    ) : (
+                      <span style={{ fontWeight: "600", color: "var(--text-main)" }}>Assigned to you</span>
+                    )
+                  )}
+                  <span style={{ margin: "0 8px" }}>·</span>
                   {new Date(feed.createdAt).toLocaleString()}
                 </span>
               </div>
 
-              <div style={{ marginTop: "6px", fontWeight: feed.isAnnouncement === 1 ? "600" : "normal" }}>
+              <div style={{ fontSize: "15px", lineHeight: "1.5", color: "var(--text-main)", fontWeight: feed.isAnnouncement === 1 ? "600" : "400" }}>
                 {feed.message}
               </div>
             </div>
