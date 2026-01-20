@@ -12,25 +12,15 @@ function Feed() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
- 
-useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  useEffect(() => {
-  if (!user?.emp_pkey) return; // ⛔ wait until user is loaded
+  const [announcementLoading, setAnnouncementLoading] = useState(false);
 
   const loadFeeds = async () => {
+    if (!user?.emp_pkey) return;
     try {
       const empId = user.emp_pkey;
-
       const res = await fetch(
         `http://localhost:8080/api/feeds/employee/${empId}`
       );
-
       const data = await res.json();
       setFeeds(Array.isArray(data) ? data : []);
     } catch (e) {
@@ -39,43 +29,53 @@ useEffect(() => {
     }
   };
 
-  loadFeeds();
-}, [user]); // ✅ runs when user changes
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!user?.emp_pkey) return; // ⛔ wait until user is loaded
+
+    loadFeeds();
+  }, [user]); // ✅ runs when user changes
 
 
   // Fetch employees
 
   useEffect(() => {
-  if (!user?.user_id) return; // ⛔ wait until user is ready
+    if (!user?.user_id) return; // ⛔ wait until user is ready
 
-  const fetchEmployees = async () => {
-    try {
-      const res = await fetch(
-        `https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${user.user_id}`
-      );
+    const fetchEmployees = async () => {
+      try {
+        const res = await fetch(
+          `https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${user.user_id}`
+        );
 
-      const json = await res.json();
+        const json = await res.json();
 
-      if (json.success === 1 && Array.isArray(json.data)) {
-        const normalized = json.data
-          .map(emp => ({
-            id: emp.emp_pkey,
-            fullName: emp.EmpName?.trim()
-          }))
-          .filter(emp => emp.fullName);
+        if (json.success === 1 && Array.isArray(json.data)) {
+          const normalized = json.data
+            .map(emp => ({
+              id: emp.emp_pkey,
+              fullName: emp.EmpName?.trim()
+            }))
+            .filter(emp => emp.fullName);
 
-        setEmployees(normalized);
-      } else {
+          setEmployees(normalized);
+        } else {
+          setEmployees([]);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
         setEmployees([]);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setEmployees([]);
-    }
-  };
+    };
 
-  fetchEmployees();
-}, [user]); // ✅ dependency
+    fetchEmployees();
+  }, [user]); // ✅ dependency
 
 
   // Add recipient
@@ -135,6 +135,7 @@ useEffect(() => {
         alert("Feed sent successfully!");
         setMessage("");
         setSelectedRecipients([{ id: "all", name: "All employees" }]);
+        loadFeeds(); // Refresh feed
       } else {
         alert("Failed to send feed.");
       }
@@ -143,6 +144,46 @@ useEffect(() => {
       alert("Error sending feed.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle Announcement
+  const handleSendAnnouncement = async () => {
+    if (!message.trim()) return;
+
+    const payload = {
+      message,
+      recipientType: "ALL",
+      recipientIds: [],
+      isAnnouncement: 1
+    };
+
+    try {
+      setAnnouncementLoading(true);
+      const res = await fetch("http://localhost:8080/api/feeds", {
+        // ... existing headers and body ...
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json();
+
+      if (json.success) {
+        alert("Announcement sent successfully!");
+        setMessage("");
+        setSelectedRecipients([{ id: "all", name: "All employees" }]);
+        loadFeeds(); // Refresh feed
+      } else {
+        alert("Failed to send announcement.");
+      }
+    } catch (err) {
+      console.error("Announcement error:", err);
+      alert("Error sending announcement.");
+    } finally {
+      setAnnouncementLoading(false);
     }
   };
 
@@ -225,6 +266,13 @@ useEffect(() => {
             {loading ? "Sending..." : "SEND"}
           </button>
           <button
+            className="announcement-button"
+            disabled={!message.trim() || announcementLoading}
+            onClick={handleSendAnnouncement}
+          >
+            {announcementLoading ? "Sending..." : "SEND ANNOUNCEMENT"}
+          </button>
+          <button
             className="cancel-button"
             onClick={() => {
               setMessage("");
@@ -236,35 +284,42 @@ useEffect(() => {
         </div>
       </div>
       {/* FEEDS LIST */}
-<div style={{ marginTop: "20px" }}>
-  {feeds.length === 0 ? (
-    <p>No feeds available</p>
-  ) : (
-    feeds.map(feed => (
-      <div
-        key={feed.feedId}
-        style={{
-          background: "#fff",
-          border: "1px solid #ddd",
-          padding: "10px",
-          marginBottom: "10px",
-          borderRadius: "6px"
-        }}
-      >
-        <div style={{ fontSize: "12px", color: "#888" }}>
-          {feed.isGlobal ? "All Employees" : "Assigned to you"} ·{" "}
-          {new Date(feed.createdAt).toLocaleString()}
-        </div>
+      <div style={{ marginTop: "20px" }}>
+        {feeds.length === 0 ? (
+          <p>No feeds available</p>
+        ) : (
+          feeds.map(feed => (
+            <div
+              key={feed.feedId}
+              className={`feed-item ${feed.isAnnouncement === 1 ? 'announcement-feed' : ''}`}
+              style={{
+                background: feed.isAnnouncement === 1 ? "#fff9e6" : "#fff",
+                border: feed.isAnnouncement === 1 ? "1px solid #ffd700" : "1px solid #ddd",
+                padding: "10px",
+                marginBottom: "10px",
+                borderRadius: "6px"
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#888" }}>
+                <span>
+                  {feed.isAnnouncement === 1 ? (
+                    <strong style={{ color: "#d4a017" }}>ANNOUNCEMENT</strong>
+                  ) : (
+                    feed.isGlobal ? "All Employees" : "Assigned to you"
+                  )} ·{" "}
+                  {new Date(feed.createdAt).toLocaleString()}
+                </span>
+              </div>
 
-        <div style={{ marginTop: "6px" }}>
-          {feed.message}
-        </div>
+              <div style={{ marginTop: "6px", fontWeight: feed.isAnnouncement === 1 ? "600" : "normal" }}>
+                {feed.message}
+              </div>
+            </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
 
-    </div>
+    </div >
   );
 }
 

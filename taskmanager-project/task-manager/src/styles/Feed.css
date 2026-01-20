@@ -196,11 +196,35 @@
 
 .send-button:hover { background: #1eb5e6; }
 
-.cancel-button {
-  background: none;
+.announcement-button {
+  background: #f5a623;
+  color: white;
   border: none;
-  color: #a9adb3;
-  font-size: 12px;
+  padding: 8px 25px;
+  border-radius: 2px;
   font-weight: 700;
+  font-size: 12px;
   cursor: pointer;
+}
+
+.announcement-button:hover { background: #e09612; }
+
+.announcement-button:disabled {
+  background: #fcd596;
+  cursor: not-allowed;
+}
+
+.announcement-feed {
+  position: relative;
+  overflow: hidden;
+}
+
+.announcement-feed::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #f5a623;
 }

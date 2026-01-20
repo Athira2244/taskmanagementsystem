@@ -42,7 +42,7 @@ public interface FeedRepository extends JpaRepository<Feed, Integer> {
                 FROM FeedRecipient fr
                 WHERE fr.empFkey = :empId
            )
-        ORDER BY f.createdAt DESC
+        ORDER BY f.isAnnouncement DESC, f.createdAt DESC
     """)
     List<Feed> findFeedsForEmployee(@Param("empId") Integer empId);
 }

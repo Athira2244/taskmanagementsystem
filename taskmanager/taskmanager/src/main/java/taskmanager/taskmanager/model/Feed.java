@@ -21,6 +21,9 @@ public class Feed {
 
     private LocalDateTime createdAt;
 
+    @Column(name = "is_announcement")
+    private Integer isAnnouncement;
+
     public Feed() {
         this.createdAt = LocalDateTime.now();
     }
@@ -64,5 +67,13 @@ public class Feed {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Integer getIsAnnouncement() {
+        return isAnnouncement;
+    }
+
+    public void setIsAnnouncement(Integer isAnnouncement) {
+        this.isAnnouncement = isAnnouncement;
     }
 }

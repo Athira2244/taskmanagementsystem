@@ -26,6 +26,13 @@ public class FeedService {
         Feed feed = new Feed();
         feed.setSenderId(senderId);
         feed.setMessage(dto.getMessage());
+        feed.setIsAnnouncement(dto.getIsAnnouncement() != null ? dto.getIsAnnouncement() : 0);
+
+        if (dto.getIsAnnouncement() != null && dto.getIsAnnouncement() == 1) {
+            feed.setIsGlobal(true);
+            feedRepository.save(feed);
+            return;
+        }
 
         if ("ALL".equalsIgnoreCase(dto.getRecipientType())) {
             feed.setIsGlobal(true);
