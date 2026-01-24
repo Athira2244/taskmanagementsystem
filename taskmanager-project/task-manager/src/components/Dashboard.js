@@ -9,6 +9,7 @@ function Dashboard() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [user, setUser] = useState(null);
   const [employees, setEmployees] = useState([]);
+  const [filterType, setFilterType] = useState("all"); // 'all', 'assigned', 'created'
 
 
 
@@ -50,11 +51,14 @@ function Dashboard() {
       const assigneeId = user?.emp_pkey;
 
       if (assigneeId) {
-        // Use new endpoint that combines tasks and task_assignees
-        fetch(`http://localhost:8080/api/tasks/assignee/${assigneeId}`)
+        // Use new endpoint that combines tasks created by and assigned to the user
+        fetch(`http://localhost:8080/api/tasks/user/${user.emp_pkey}`)
           .then(res => res.json())
-          .then(data => setTasks(data))
-          .catch(err => console.error("Failed to load tasks", err));
+          .then(data => setTasks(Array.isArray(data) ? data : []))
+          .catch(err => {
+            console.error("Failed to load tasks", err);
+            setTasks([]);
+          });
       }
     }
   };
@@ -64,11 +68,20 @@ function Dashboard() {
   }, []);
 
   const employeeName = user?.employee_name || "Employee";
-
   const loggedInUserId = user?.emp_pkey;
 
-  // All tasks are already filtered by the backend
-  const assignedTasks = tasks;
+  // Filter tasks based on selected filterType
+  const filteredTasks = (Array.isArray(tasks) ? tasks : []).filter(task => {
+    if (filterType === "assigned") {
+      return Number(task.assigneeId) === Number(loggedInUserId);
+    }
+    if (filterType === "created") {
+      return Number(task.createdBy) === Number(loggedInUserId);
+    }
+    return true; // 'all'
+  });
+
+  const assignedTasks = filteredTasks;
 
   // Helper function to get employee name by ID
   const getEmployeeName = (assigneeId) => {
@@ -126,7 +139,59 @@ function Dashboard() {
 
       {/* Task Section */}
       <div className="section-header">
-        <h3>Tasks</h3>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <h3>Tasks</h3>
+          <div className="filter-tabs" style={{ display: "flex", gap: "10px", background: "#f1f5f9", padding: "4px", borderRadius: "100px" }}>
+            <button
+              onClick={() => setFilterType("all")}
+              style={{
+                border: "none",
+                padding: "6px 16px",
+                borderRadius: "100px",
+                fontSize: "12px",
+                fontWeight: "600",
+                cursor: "pointer",
+                background: filterType === "all" ? "var(--primary)" : "transparent",
+                color: filterType === "all" ? "white" : "var(--text-muted)",
+                transition: "var(--transition)"
+              }}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilterType("assigned")}
+              style={{
+                border: "none",
+                padding: "6px 16px",
+                borderRadius: "100px",
+                fontSize: "12px",
+                fontWeight: "600",
+                cursor: "pointer",
+                background: filterType === "assigned" ? "var(--primary)" : "transparent",
+                color: filterType === "assigned" ? "white" : "var(--text-muted)",
+                transition: "var(--transition)"
+              }}
+            >
+              Assigned to Me
+            </button>
+            <button
+              onClick={() => setFilterType("created")}
+              style={{
+                border: "none",
+                padding: "6px 16px",
+                borderRadius: "100px",
+                fontSize: "12px",
+                fontWeight: "600",
+                cursor: "pointer",
+                background: filterType === "created" ? "var(--primary)" : "transparent",
+                color: filterType === "created" ? "white" : "var(--text-muted)",
+                transition: "var(--transition)"
+              }}
+            >
+              Created by Me
+            </button>
+          </div>
+        </div>
         <button className="btn-primary" onClick={() => setShowModal(true)}>
           + Create Task
         </button>

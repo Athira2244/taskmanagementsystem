@@ -43,6 +43,15 @@ public class TaskResponse {
     @JsonProperty("createdByName")
     private String createdByName;
 
+    @JsonProperty("pendingDate")
+    private LocalDateTime pendingDate;
+
+    @JsonProperty("inProgressDate")
+    private LocalDateTime inProgressDate;
+
+    @JsonProperty("completedDate")
+    private LocalDateTime completedDate;
+
     // Constructors
     public TaskResponse() {}
 
@@ -150,4 +159,13 @@ public class TaskResponse {
     public void setCreatedByName(String createdByName) {
         this.createdByName = createdByName;
     }
+
+    public LocalDateTime getPendingDate() { return pendingDate; }
+    public void setPendingDate(LocalDateTime pendingDate) { this.pendingDate = pendingDate; }
+
+    public LocalDateTime getInProgressDate() { return inProgressDate; }
+    public void setInProgressDate(LocalDateTime inProgressDate) { this.inProgressDate = inProgressDate; }
+
+    public LocalDateTime getCompletedDate() { return completedDate; }
+    public void setCompletedDate(LocalDateTime completedDate) { this.completedDate = completedDate; }
 }

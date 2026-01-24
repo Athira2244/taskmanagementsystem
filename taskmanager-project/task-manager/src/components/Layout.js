@@ -6,6 +6,8 @@ import Sidebar from "./Sidebar";
 import Dashboard from "./Dashboard";
 import Feed from "./Feed";
 import Profile from "./Profile";
+import Reports from "./Reports";
+import Settings from "./Settings";
 
 function Layout({ onLogout }) {
   const [page, setPage] = useState("dashboard");
@@ -17,10 +19,14 @@ function Layout({ onLogout }) {
       case "tasks":
         return <Dashboard />;
       case "profile":
-  return <Profile onBack={() => setPage("dashboard")} onLogout={() => window.location.reload()} />;
+        return <Profile onBack={() => setPage("dashboard")} onLogout={() => window.location.reload()} />;
+      case "reports":
+        return <Reports />;
+      case "settings":
+        return <Settings />;
 
 
-      
+
       default:
         return <Dashboard />;
     }

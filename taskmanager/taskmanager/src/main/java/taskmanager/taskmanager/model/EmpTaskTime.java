@@ -34,7 +34,18 @@ public class EmpTaskTime {
     @Column(name = "created_date")
     private LocalDateTime createdDate = LocalDateTime.now();
 
+    @Column(name = "emp_name")
+    private String empName;
+
     // getters & setters
+
+    public String getEmpName() {
+        return empName;
+    }
+
+    public void setEmpName(String empName) {
+        this.empName = empName;
+    }
 
     public Integer getEmpFkey() {
         return empFkey;

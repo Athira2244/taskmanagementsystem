@@ -16,12 +16,18 @@ function Sidebar({ active, onNavigate }) {
         >
           Feed
         </li>
-        {/* <li
-          className={active === "tasks" ? "active" : ""}
-          onClick={() => onNavigate("tasks")}
+        <li
+          className={active === "reports" ? "active" : ""}
+          onClick={() => onNavigate("reports")}
         >
-          Tasks
-        </li> */}
+          Reports
+        </li>
+        <li
+          className={active === "settings" ? "active" : ""}
+          onClick={() => onNavigate("settings")}
+        >
+          Checklist Templates
+        </li>
       </ul>
     </div>
   );

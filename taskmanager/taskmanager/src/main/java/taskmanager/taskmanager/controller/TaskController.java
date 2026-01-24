@@ -22,10 +22,20 @@ public class TaskController {
 
     private final TaskRepository taskRepository;
     private final TaskAssigneeService taskAssigneeService;
+    private final taskmanager.taskmanager.repository.EmpTaskTimeRepository empTaskTimeRepository;
+    private final taskmanager.taskmanager.repository.ChecklistTemplateItemRepository checklistTemplateItemRepo;
+    private final taskmanager.taskmanager.repository.TaskChecklistItemRepository taskChecklistItemRepo;
 
-    public TaskController(TaskRepository taskRepository, TaskAssigneeService taskAssigneeService) {
+    public TaskController(TaskRepository taskRepository, 
+                          TaskAssigneeService taskAssigneeService, 
+                          taskmanager.taskmanager.repository.EmpTaskTimeRepository empTaskTimeRepository,
+                          taskmanager.taskmanager.repository.ChecklistTemplateItemRepository checklistTemplateItemRepo,
+                          taskmanager.taskmanager.repository.TaskChecklistItemRepository taskChecklistItemRepo) {
         this.taskRepository = taskRepository;
         this.taskAssigneeService = taskAssigneeService;
+        this.empTaskTimeRepository = empTaskTimeRepository;
+        this.checklistTemplateItemRepo = checklistTemplateItemRepo;
+        this.taskChecklistItemRepo = taskChecklistItemRepo;
     }
 
     // CREATE TASK
@@ -41,6 +51,7 @@ public class TaskController {
         task.setEmpName(request.getEmpName());       // EmpName
         task.setCreatedBy(request.getCreatedBy());
         task.setCreatedByName(request.getCreatedByName());
+        task.setPendingDate(java.time.LocalDateTime.now()); // Set pending date on creation
 
         // Employee employee = new Employee();
         // employee.setEmployeeId(request.getAssigneeId());
@@ -50,7 +61,33 @@ public class TaskController {
 // System.out.println("DEBUG AssigneeId = [" + request.getAssigneeId() + "]");
         System.out.println("DEBUG CreatedBy received: " + request.getCreatedBy());
 
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        // Handle Checklist Template
+        // Handle Checklist Template
+        if (request.getChecklistTemplateId() != null) {
+            List<taskmanager.taskmanager.model.ChecklistTemplateItem> items = checklistTemplateItemRepo.findByTemplateId(request.getChecklistTemplateId());
+            for (taskmanager.taskmanager.model.ChecklistTemplateItem item : items) {
+                taskmanager.taskmanager.model.TaskChecklistItem checklistItem = new taskmanager.taskmanager.model.TaskChecklistItem();
+                checklistItem.setTaskId(savedTask.getId());
+                checklistItem.setItemText(item.getItemText());
+                checklistItem.setIsCompleted(false);
+                taskChecklistItemRepo.save(checklistItem);
+            }
+        }
+        
+        // Handle Ad-hoc Checklist Items
+        if (request.getChecklistItems() != null && !request.getChecklistItems().isEmpty()) {
+            for (String itemText : request.getChecklistItems()) {
+                taskmanager.taskmanager.model.TaskChecklistItem checklistItem = new taskmanager.taskmanager.model.TaskChecklistItem();
+                checklistItem.setTaskId(savedTask.getId());
+                checklistItem.setItemText(itemText);
+                checklistItem.setIsCompleted(false);
+                taskChecklistItemRepo.save(checklistItem);
+            }
+        }
+
+        return savedTask;
     }
 
     // GET ALL TASKS (old endpoint - kept for compatibility)
@@ -59,10 +96,48 @@ public class TaskController {
         return taskRepository.findAll();
     }
 
+    // GET TASKS FOR USER (both created and assigned)
+    @GetMapping("/user/{userId}")
+    public List<TaskResponse> getTasksForUser(@PathVariable Integer userId) {
+        return taskAssigneeService.getTasksByUser(userId);
+    }
+
     // GET TASKS FOR ASSIGNEE - combines tasks and task_assignees
     @GetMapping("/assignee/{assigneeId}")
     public List<TaskResponse> getTasksForAssignee(@PathVariable Integer assigneeId) {
         return taskAssigneeService.getTasksForAssignee(assigneeId);
+    }
+
+    // GET TASK REPORT FOR EMPLOYEE
+    @GetMapping("/report/{empId}")
+    public List<taskmanager.taskmanager.dto.TaskReportDTO> getTaskReport(@PathVariable Integer empId) {
+        List<TaskResponse> tasks = taskAssigneeService.getTasksForAssignee(empId);
+        List<taskmanager.taskmanager.dto.TaskReportDTO> reportList = new java.util.ArrayList<>();
+
+        for (TaskResponse task : tasks) {
+            taskmanager.taskmanager.dto.TaskReportDTO report = new taskmanager.taskmanager.dto.TaskReportDTO();
+            report.setTaskId(task.getTaskId());
+            report.setTaskName(task.getTaskName());
+            report.setDescription(task.getDescription());
+            report.setEmpName(task.getEmpName());
+            report.setCreatedDate(task.getPendingDate()); // Mapping pendingDate to createdDate for report
+            report.setInProgressDate(task.getInProgressDate());
+            report.setCompletedDate(task.getCompletedDate());
+            report.setStatus(task.getStatus());
+
+            // Calculate Total Time
+            List<taskmanager.taskmanager.model.EmpTaskTime> timeLogs = empTaskTimeRepository.findByTaskFkey(task.getTaskId().intValue());
+            int totalMinutes = timeLogs.stream().mapToInt(taskmanager.taskmanager.model.EmpTaskTime::getDurationMinutes).sum();
+            
+            // Format to HH:mm
+            int hours = totalMinutes / 60;
+            int minutes = totalMinutes % 60;
+            String timeString = String.format("%02d:%02d", hours, minutes);
+            report.setTotalTimeTaken(timeString);
+
+            reportList.add(report);
+        }
+        return reportList;
     }
 
     // UPDATE TASK STATUS - handles both scenarios (parent task or reassigned)
@@ -136,6 +211,36 @@ public Map<String, String> updateTask(
         task.setStatus(request.getStatus());
 
     taskRepository.save(task);
+
+    // Handle Checklist Template Update (Add items if template selected and no items exist)
+    // Handle Checklist Template Update (Add items if template selected and no items exist)
+    if (request.getChecklistTemplateId() != null) {
+        // Simple logic: if a template is selected during update, we add its items. 
+        // You might want to delete existing items first if you're replacing the checklist.
+        // For now, let's just add them if it's a "new" assignment of a checklist.
+        List<taskmanager.taskmanager.model.TaskChecklistItem> existing = taskChecklistItemRepo.findByTaskId(id);
+        if (existing.isEmpty()) {
+            List<taskmanager.taskmanager.model.ChecklistTemplateItem> items = checklistTemplateItemRepo.findByTemplateId(request.getChecklistTemplateId());
+            for (taskmanager.taskmanager.model.ChecklistTemplateItem item : items) {
+                taskmanager.taskmanager.model.TaskChecklistItem checklistItem = new taskmanager.taskmanager.model.TaskChecklistItem();
+                checklistItem.setTaskId(id);
+                checklistItem.setItemText(item.getItemText());
+                checklistItem.setIsCompleted(false);
+                taskChecklistItemRepo.save(checklistItem);
+            }
+        }
+    }
+
+    // Handle Ad-hoc Checklist Items (Add new items)
+    if (request.getChecklistItems() != null && !request.getChecklistItems().isEmpty()) {
+       for (String itemText : request.getChecklistItems()) {
+           taskmanager.taskmanager.model.TaskChecklistItem checklistItem = new taskmanager.taskmanager.model.TaskChecklistItem();
+           checklistItem.setTaskId(id);
+           checklistItem.setItemText(itemText);
+           checklistItem.setIsCompleted(false);
+           taskChecklistItemRepo.save(checklistItem);
+       }
+    }
 
     Map<String, String> response = new HashMap<>();
     response.put("message", assigneeChanged ? "Task reassigned successfully" : "Task updated successfully");

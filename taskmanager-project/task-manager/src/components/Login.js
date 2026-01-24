@@ -6,27 +6,19 @@ function Login({ onSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
     try {
-      // 🔐 SHA1 hash (matches PHP sha1())
-      // const hashedPassword = SHA1(password).toString();
-
-      // const response = await fetch(
-      //   `https://v1.mypayrollmaster.online/api/v2qa/login?user_id=${encodeURIComponent(
-      //     username
-      //   )}&password=085fd58411291705934218e1c478b06fd161cc2b`
-      // );
-
       const response = await fetch(
-  `https://v1.mypayrollmaster.online/api/v2qa/login?user_id=${encodeURIComponent(
-    username
-  )}&password=${encodeURIComponent(password)}`
-);
-
+        `https://v1.mypayrollmaster.online/api/v2qa/login?user_id=${encodeURIComponent(
+          username
+        )}&password=${encodeURIComponent(password)}`
+      );
 
       const data = await response.json();
 
@@ -35,11 +27,11 @@ function Login({ onSuccess }) {
         localStorage.setItem("user", JSON.stringify(data.data));
         onSuccess(data.data);
       } else {
-        alert("Invalid login credentials");
+        setError("Invalid login credentials");
       }
     } catch (err) {
       console.error("Login error:", err);
-      alert("Server error. Please try again.");
+      setError("Server error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -54,11 +46,26 @@ function Login({ onSuccess }) {
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
+          {error && (
+            <div style={{
+              color: "#dc2626",
+              background: "#fee2e2",
+              padding: "10px",
+              borderRadius: "6px",
+              marginBottom: "15px",
+              fontSize: "14px",
+              textAlign: "center",
+              border: "1px solid #fecaca"
+            }}>
+              {error}
+            </div>
+          )}
+
           <div className="input-field">
             <label>Username</label>
             <input
               type="text"
-              placeholder="Enter your username"
+              placeholder="Enter username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -69,7 +76,7 @@ function Login({ onSuccess }) {
             <label>Password</label>
             <input
               type="password"
-              placeholder="Enter your password"
+              placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

@@ -33,6 +33,12 @@ public class TaskRequest {
     @JsonProperty("createdByName")
     private String createdByName;
 
+    @JsonProperty("checklistTemplateId")
+    private Long checklistTemplateId;
+
+    @JsonProperty("checklistItems")
+    private java.util.List<String> checklistItems;
+
     // ✅ Getters
     public String getTaskName() { return taskName; }
     public String getDescription() { return description; }
@@ -42,6 +48,8 @@ public class TaskRequest {
     public String getEmpName() { return empName; }
     public Integer getCreatedBy() { return createdBy; }
     public String getCreatedByName() { return createdByName; }
+    public Long getChecklistTemplateId() { return checklistTemplateId; }
+    public java.util.List<String> getChecklistItems() { return checklistItems; }
 
     // ✅ Setters
     public void setTaskName(String taskName) { this.taskName = taskName; }
@@ -52,6 +60,8 @@ public class TaskRequest {
     public void setEmpName(String empName) { this.empName = empName; }
     public void setCreatedBy(Integer createdBy) { this.createdBy = createdBy; }
     public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
+    public void setChecklistTemplateId(Long checklistTemplateId) { this.checklistTemplateId = checklistTemplateId; }
+    public void setChecklistItems(java.util.List<String> checklistItems) { this.checklistItems = checklistItems; }
     // public void setAttachment(String attachment) { this.attachment = attachment; }
 }
 

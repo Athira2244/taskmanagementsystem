@@ -18,7 +18,17 @@ public class EmpTaskTimeRequest {
 
     private String comment;
 
+    private String empName;
+
     // getters & setters
+
+    public String getEmpName() {
+        return empName;
+    }
+
+    public void setEmpName(String empName) {
+        this.empName = empName;
+    }
 
     public Integer getEmpFkey() {
         return empFkey;

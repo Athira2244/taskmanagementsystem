@@ -108,6 +108,15 @@ public class TaskAssignee {
         this.assignedAt = assignedAt;
     }
 
+    @Column(name = "pending_date")
+    private LocalDateTime pendingDate;
+
+    @Column(name = "in_progress_date")
+    private LocalDateTime inProgressDate;
+
+    @Column(name = "completed_date")
+    private LocalDateTime completedDate;
+
     public String getEmpName() {
         return empName;
     }
@@ -115,6 +124,15 @@ public class TaskAssignee {
     public void setEmpName(String empName) {
         this.empName = empName;
     }
+
+    public LocalDateTime getPendingDate() { return pendingDate; }
+    public void setPendingDate(LocalDateTime pendingDate) { this.pendingDate = pendingDate; }
+
+    public LocalDateTime getInProgressDate() { return inProgressDate; }
+    public void setInProgressDate(LocalDateTime inProgressDate) { this.inProgressDate = inProgressDate; }
+
+    public LocalDateTime getCompletedDate() { return completedDate; }
+    public void setCompletedDate(LocalDateTime completedDate) { this.completedDate = completedDate; }
 
     public String getTaskName() {
         return taskName;

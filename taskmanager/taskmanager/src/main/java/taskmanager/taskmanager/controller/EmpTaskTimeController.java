@@ -34,6 +34,7 @@ public class EmpTaskTimeController {
         time.setEndTime(request.getEndTime());
         time.setDurationMinutes(request.getDurationMinutes());
         time.setComment(request.getComment());
+        time.setEmpName(request.getEmpName());
 
         return ResponseEntity.ok(repo.save(time));
     }

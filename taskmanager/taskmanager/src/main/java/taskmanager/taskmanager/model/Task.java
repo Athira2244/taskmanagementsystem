@@ -45,6 +45,15 @@ public class Task {
     @Column(name = "created_by_name")
     private String createdByName;
 
+    @Column(name = "pending_date")
+    private LocalDateTime pendingDate;
+
+    @Column(name = "in_progress_date")
+    private LocalDateTime inProgressDate;
+
+    @Column(name = "completed_date")
+    private LocalDateTime completedDate;
+
     // getters & setters
     public Long getId() { return id; }
 
@@ -65,6 +74,15 @@ public class Task {
 
     public String getCreatedByName() { return createdByName; }
     public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
+
+    public LocalDateTime getPendingDate() { return pendingDate; }
+    public void setPendingDate(LocalDateTime pendingDate) { this.pendingDate = pendingDate; }
+
+    public LocalDateTime getInProgressDate() { return inProgressDate; }
+    public void setInProgressDate(LocalDateTime inProgressDate) { this.inProgressDate = inProgressDate; }
+
+    public LocalDateTime getCompletedDate() { return completedDate; }
+    public void setCompletedDate(LocalDateTime completedDate) { this.completedDate = completedDate; }
 
     // public Employee getAssignee() { return assignee; }
     // public void setAssignee(Employee assignee) { this.assignee = assignee; }

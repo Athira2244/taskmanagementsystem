@@ -33,51 +33,86 @@ public class TaskAssigneeService {
         // 1. Get tasks from tasks table where is_assignee = 1 (never reassigned)
         List<Task> parentTasks = taskRepository.findByAssigneeIdAndIsAssignee(assigneeId, 1);
         for (Task task : parentTasks) {
-            TaskResponse response = new TaskResponse();
-            response.setId(task.getId());
-            response.setTaskId(task.getId());
-            response.setTaskName(task.getTaskName());
-            response.setDescription(task.getDescription());
-            response.setAssigneeId(task.getAssigneeId());
-            response.setEmpName(task.getEmpName());
-            System.out.println("DEBUG: Parent task ID " + task.getId() + ", EmpName from task: " + task.getEmpName());
-            response.setDeadline(task.getDeadline());
-            response.setStatus(task.getStatus());
-            response.setAttachment(task.getAttachment());
-            response.setSource("tasks");
-            response.setIsAssignee(1);
-            response.setCreatedBy(task.getCreatedBy());
-            response.setCreatedByName(task.getCreatedByName());
-            result.add(response);
+            result.add(mapToResponse(task, null, "tasks", 1));
         }
 
         // 2. Get tasks from task_assignees table where is_assignee = 1
         List<TaskAssignee> assignedTasks = taskAssigneeRepository.findByAssigneeIdAndIsAssignee(assigneeId, 1);
         for (TaskAssignee ta : assignedTasks) {
-            // Get parent task details
             Optional<Task> parentTaskOpt = taskRepository.findById(ta.getTaskId());
             if (parentTaskOpt.isPresent()) {
-                Task parentTask = parentTaskOpt.get();
-                TaskResponse response = new TaskResponse();
-                response.setId(ta.getId());
-                response.setTaskId(ta.getTaskId());
-                response.setTaskName(parentTask.getTaskName());
-                response.setDescription(parentTask.getDescription());
-                response.setAssigneeId(ta.getAssigneeId());
-                response.setEmpName(ta.getAssigneeName()); // Use assigneeName from task_assignees
-                System.out.println("DEBUG: Assigned task ID " + ta.getId() + ", assigneeName from ta: " + ta.getAssigneeName());
-                response.setDeadline(parentTask.getDeadline());
-                response.setStatus(ta.getStatus()); // Status from task_assignees
-                response.setAttachment(parentTask.getAttachment());
-                response.setSource("task_assignees");
-                response.setIsAssignee(ta.getIsAssignee());
-                response.setCreatedBy(parentTask.getCreatedBy());
-                response.setCreatedByName(parentTask.getCreatedByName());
-                result.add(response);
+                result.add(mapToResponse(parentTaskOpt.get(), ta, "task_assignees", ta.getIsAssignee()));
             }
         }
 
         return result;
+    }
+
+    /**
+     * Get all tasks related to a user (Assigned or Created)
+     */
+    public List<TaskResponse> getTasksByUser(Integer userId) {
+        java.util.Set<Long> taskIds = new java.util.HashSet<>();
+        List<TaskResponse> result = new ArrayList<>();
+
+        // 1. Get Assigned Tasks (using existing logic)
+        List<TaskResponse> assigned = getTasksForAssignee(userId);
+        for (TaskResponse r : assigned) {
+            result.add(r);
+            taskIds.add(r.getTaskId());
+        }
+
+        // 2. Get Created Tasks
+        List<Task> createdTasks = taskRepository.findByCreatedBy(userId);
+        for (Task task : createdTasks) {
+            if (!taskIds.contains(task.getId())) {
+                // Determine if there's a current assignment for this task
+                Optional<TaskAssignee> currentAssigneeOpt = taskAssigneeRepository.findByTaskIdAndIsAssignee(task.getId(), 1);
+                
+                if (currentAssigneeOpt.isPresent()) {
+                    result.add(mapToResponse(task, currentAssigneeOpt.get(), "task_assignees", 1));
+                } else {
+                    result.add(mapToResponse(task, null, "tasks", task.getIsAssignee()));
+                }
+                taskIds.add(task.getId());
+            }
+        }
+
+        return result;
+    }
+
+    private TaskResponse mapToResponse(Task task, TaskAssignee ta, String source, Integer isAssignee) {
+        TaskResponse response = new TaskResponse();
+        response.setTaskId(task.getId());
+        response.setTaskName(task.getTaskName());
+        response.setDescription(task.getDescription());
+        response.setDeadline(task.getDeadline());
+        response.setCreatedBy(task.getCreatedBy());
+        response.setCreatedByName(task.getCreatedByName());
+        response.setAttachment(task.getAttachment());
+        
+        if (ta != null) {
+            response.setId(ta.getId());
+            response.setAssigneeId(ta.getAssigneeId());
+            response.setEmpName(ta.getAssigneeName());
+            response.setStatus(ta.getStatus());
+            response.setPendingDate(ta.getPendingDate());
+            response.setInProgressDate(ta.getInProgressDate());
+            response.setCompletedDate(ta.getCompletedDate());
+            response.setSource("task_assignees");
+            response.setIsAssignee(ta.getIsAssignee());
+        } else {
+            response.setId(task.getId());
+            response.setAssigneeId(task.getAssigneeId());
+            response.setEmpName(task.getEmpName());
+            response.setStatus(task.getStatus());
+            response.setPendingDate(task.getPendingDate());
+            response.setInProgressDate(task.getInProgressDate());
+            response.setCompletedDate(task.getCompletedDate());
+            response.setSource("tasks");
+            response.setIsAssignee(isAssignee);
+        }
+        return response;
     }
 
     /**
@@ -128,6 +163,7 @@ public class TaskAssigneeService {
         newAssignment.setStatus("PENDING");
         newAssignment.setIsAssignee(1);
         newAssignment.setAssignedAt(LocalDateTime.now());
+        newAssignment.setPendingDate(LocalDateTime.now()); // Set pending date for new assignment
 
         return taskAssigneeRepository.save(newAssignment);
     }
@@ -144,12 +180,26 @@ public class TaskAssigneeService {
             // Update status in task_assignees
             TaskAssignee taskAssignee = taskAssigneeOpt.get();
             taskAssignee.setStatus(newStatus);
+            
+            if ("IN_PROGRESS".equals(newStatus)) {
+                taskAssignee.setInProgressDate(LocalDateTime.now());
+            } else if ("COMPLETED".equals(newStatus)) {
+                taskAssignee.setCompletedDate(LocalDateTime.now());
+            }
+
             taskAssigneeRepository.save(taskAssignee);
         } else {
             // Update status in tasks table (never reassigned)
             Task task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new RuntimeException("Task not found"));
             task.setStatus(newStatus);
+
+            if ("IN_PROGRESS".equals(newStatus)) {
+                task.setInProgressDate(LocalDateTime.now());
+            } else if ("COMPLETED".equals(newStatus)) {
+                task.setCompletedDate(LocalDateTime.now());
+            }
+
             taskRepository.save(task);
         }
     }

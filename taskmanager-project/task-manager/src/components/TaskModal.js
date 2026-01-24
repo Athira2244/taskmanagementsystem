@@ -7,6 +7,10 @@ function TaskModal({ onClose, onTaskCreated }) {
   const [assigneeId, setAssigneeId] = useState("");
   const [employees, setEmployees] = useState([]);
   const [user, setUser] = useState(null);
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
+  const [checklistItems, setChecklistItems] = useState([]);
+  const [newChecklistItem, setNewChecklistItem] = useState("");
 
 
   useEffect(() => {
@@ -35,6 +39,14 @@ function TaskModal({ onClose, onTaskCreated }) {
         console.error("Failed to load employees", err);
         setEmployees([]);
       });
+
+    // Load checklist templates
+    if (user?.emp_pkey) {
+      fetch(`http://localhost:8080/api/checklists/templates/user/${user.emp_pkey}`)
+        .then(res => res.json())
+        .then(data => setTemplates(Array.isArray(data) ? data : []))
+        .catch(err => console.error("Failed to load templates", err));
+    }
   }, [user]);
 
   // Ensure current user is in the list
@@ -52,6 +64,17 @@ function TaskModal({ onClose, onTaskCreated }) {
 
 
 
+  const handleAddChecklistItem = () => {
+    if (newChecklistItem.trim()) {
+      setChecklistItems([...checklistItems, newChecklistItem.trim()]);
+      setNewChecklistItem("");
+    }
+  };
+
+  const handleRemoveChecklistItem = (index) => {
+    setChecklistItems(checklistItems.filter((_, i) => i !== index));
+  };
+
   const handleSave = async () => {
 
     // find selected employee object
@@ -67,8 +90,10 @@ function TaskModal({ onClose, onTaskCreated }) {
       assigneeId: assigneeId ? Number(assigneeId) : null,
       empName: selectedEmployee ? selectedEmployee.EmpName : "",
       deadline: deadline,
-      createdBy: Number(user?.emp_pkey || user?.user_id), // Force Number
-      createdByName: user?.employee_name || "Unknown"
+      createdBy: Number(user?.emp_pkey || user?.user_id),
+      createdByName: user?.employee_name || "Unknown",
+      checklistTemplateId: selectedTemplateId ? Number(selectedTemplateId) : null,
+      checklistItems: checklistItems
     };
 
     console.log("Saving Task Payload:", taskData);
@@ -129,6 +154,15 @@ function TaskModal({ onClose, onTaskCreated }) {
           ))}
         </select>
 
+        <select value={selectedTemplateId} onChange={e => setSelectedTemplateId(e.target.value)}>
+          <option value="">Select Checklist Template (Optional)</option>
+          {templates.map(t => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+
         <div className="form-group" style={{ marginBottom: "15px" }}>
           <label style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "5px" }}>
             Created By
@@ -138,6 +172,51 @@ function TaskModal({ onClose, onTaskCreated }) {
             disabled
             style={{ background: "#f1f5f9", color: "#64748b", cursor: "not-allowed" }}
           />
+        </div>
+
+        {/* CHECKLIST SECTION */}
+        <div className="form-group" style={{ marginBottom: "15px" }}>
+          <label style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "5px" }}>
+            Checklist (Optional)
+          </label>
+
+          <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+            <input
+              placeholder="Add checklist item..."
+              value={newChecklistItem}
+              onChange={e => setNewChecklistItem(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddChecklistItem();
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleAddChecklistItem}
+              style={{ minWidth: "60px",height:"40px"}}
+            >
+              Add
+            </button>
+          </div>
+
+          {checklistItems.length > 0 && (
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {checklistItems.map((item, index) => (
+                <li key={index} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f8fafc", padding: "8px", marginBottom: "4px", borderRadius: "4px" }}>
+                  <span style={{ fontSize: "14px" }}>{item}</span>
+                  <button
+                    onClick={() => handleRemoveChecklistItem(index)}
+                    style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "16px" }}
+                  >
+                    &times;
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
 

@@ -8,6 +8,9 @@ function TaskDetails({ task, onClose, onStatusChange }) {
   const [newEntry, setNewEntry] = useState(null);
   const [status, setStatus] = useState(task.status);
   const [employees, setEmployees] = useState([]);
+  const [checklistItems, setChecklistItems] = useState([]);
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
 
 
   useEffect(() => {
@@ -29,6 +32,14 @@ function TaskDetails({ task, onClose, onStatusChange }) {
         console.error("Failed to load employees", err);
         setEmployees([]);
       });
+
+    // Load checklist templates
+    if (storedUser?.emp_pkey) {
+      fetch(`http://localhost:8080/api/checklists/templates/user/${storedUser.emp_pkey}`)
+        .then(res => res.json())
+        .then(data => setTemplates(Array.isArray(data) ? data : []))
+        .catch(err => console.error("Failed to load templates", err));
+    }
   }, []);
 
   // Ensure current user is in the list
@@ -52,6 +63,8 @@ function TaskDetails({ task, onClose, onStatusChange }) {
     return employee?.EmpName?.trim() || "Unknown";
   };
 
+  const isCreator = Number(task.createdBy) === Number(user?.emp_pkey || user?.user_id);
+
   const [isEdit, setIsEdit] = useState(false);
   const [form, setForm] = useState({
     taskName: task.taskName,
@@ -68,8 +81,60 @@ function TaskDetails({ task, onClose, onStatusChange }) {
         assigneeId: task.assigneeId,
       });
       loadTimeEntries();
+      loadChecklistItems();
     }
   }, [task]);
+
+  const loadChecklistItems = async () => {
+    const taskIdToFetch = task.taskId || task.id;
+    try {
+      const res = await fetch(`http://localhost:8080/api/task_checklists/task/${taskIdToFetch}`);
+      const data = await res.json();
+      setChecklistItems(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error("Failed to load checklist", e);
+    }
+  };
+
+  const [newChecklistItem, setNewChecklistItem] = useState("");
+
+  const handleToggleChecklist = async (itemId) => {
+    try {
+      await fetch(`http://localhost:8080/api/task_checklists/${itemId}/toggle`, { method: "PUT" });
+      loadChecklistItems();
+    } catch (e) {
+      console.error("Toggle failed", e);
+    }
+  };
+
+  const handleAddNewChecklistItem = async () => {
+    if (!newChecklistItem.trim()) return;
+    try {
+      await fetch("http://localhost:8080/api/task_checklists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId: task.taskId || task.id,
+          itemText: newChecklistItem,
+          isCompleted: false
+        })
+      });
+      setNewChecklistItem("");
+      loadChecklistItems();
+    } catch (e) {
+      console.error("Failed to add item", e);
+    }
+  };
+
+  const handleDeleteChecklistItem = async (itemId) => {
+    if (!window.confirm("Delete this checklist item?")) return;
+    try {
+      await fetch(`http://localhost:8080/api/task_checklists/${itemId}`, { method: "DELETE" });
+      loadChecklistItems();
+    } catch (e) {
+      console.error("Failed to delete item", e);
+    }
+  };
 
   const loadTimeEntries = async () => {
     const taskIdToFetch = task.taskId || task.id;
@@ -85,6 +150,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
     let newStatus;
     if (status === "PENDING") newStatus = "IN_PROGRESS";
     else if (status === "IN_PROGRESS") newStatus = "COMPLETED";
+    else if (status === "COMPLETED" && isCreator) newStatus = "IN_PROGRESS";
     else return;
 
     // Use taskId (parent task ID) for status updates
@@ -129,6 +195,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
           description: form.description,
           assigneeId: form.assigneeId,
           empName: empName,
+          checklistTemplateId: isCreator && selectedTemplateId ? Number(selectedTemplateId) : null
         }),
       });
 
@@ -159,12 +226,13 @@ function TaskDetails({ task, onClose, onStatusChange }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        empFkey: task.assigneeId,
+        empFkey: user?.emp_pkey || user?.user_id || task.assigneeId,
         taskFkey: taskIdToSave,
         startTime: newEntry.startTime,
         endTime: newEntry.endTime,
         durationMinutes: duration(newEntry.startTime, newEntry.endTime),
         comment: newEntry.comment,
+        empName: user?.employee_name || "Myself",
       }),
     });
 
@@ -181,7 +249,11 @@ function TaskDetails({ task, onClose, onStatusChange }) {
           <h3>Task Details</h3>
           <div>
             {!isEdit ? (
-              <button className="btn-primary" onClick={() => setIsEdit(true)}>
+              <button
+                className="btn-primary"
+                onClick={() => setIsEdit(true)}
+                disabled={status === "COMPLETED" && !isCreator}
+              >
                 Edit
               </button>
             ) : (
@@ -209,9 +281,11 @@ function TaskDetails({ task, onClose, onStatusChange }) {
           {isEdit ? (
             <input
               value={form.taskName}
+              disabled={!isCreator}
               onChange={(e) =>
                 setForm({ ...form, taskName: e.target.value })
               }
+              style={!isCreator ? { background: "#f1f5f9", cursor: "not-allowed" } : {}}
             />
           ) : (
             <span>{task.taskName}</span>
@@ -242,6 +316,23 @@ function TaskDetails({ task, onClose, onStatusChange }) {
             <span>{task.empName || getEmployeeName(task.assigneeId)}</span>
           )}
 
+          {isEdit && isCreator && (
+            <>
+              <label>Assign Checklist Template</label>
+              <select
+                value={selectedTemplateId}
+                onChange={e => setSelectedTemplateId(e.target.value)}
+              >
+                <option value="">Select Checklist Template (Optional)</option>
+                {templates.map(t => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
+
           <label>Status</label>
           <span className={`task-status status-${status}`}>
             {status.replace("_", " ")}
@@ -252,9 +343,11 @@ function TaskDetails({ task, onClose, onStatusChange }) {
             <textarea
               rows="3"
               value={form.description}
+              disabled={!isCreator}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
+              style={!isCreator ? { background: "#f1f5f9", cursor: "not-allowed" } : {}}
             />
           ) : (
             <span>{task.description}</span>
@@ -262,24 +355,78 @@ function TaskDetails({ task, onClose, onStatusChange }) {
 
         </div>
 
+        {/* CHECKLIST */}
+        {checklistItems.length > 0 && (
+          <div className="task-checklist" style={{ marginTop: "20px", background: "#f8fafc", padding: "15px", borderRadius: "8px" }}>
+            <h4 style={{ margin: "0 0 10px 0", fontSize: "13px", textTransform: "uppercase", color: "#64748b" }}>Checklist</h4>
+            {checklistItems.map(item => (
+              <div key={item.id} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                <input
+                  type="checkbox"
+                  checked={item.isCompleted}
+                  onChange={() => handleToggleChecklist(item.id)}
+                  style={{ width: "auto", margin: 0, cursor: "pointer" }}
+                />
+                <span style={{
+                  fontSize: "14px",
+                  color: item.isCompleted ? "#94a3b8" : "#1e293b",
+                  textDecoration: item.isCompleted ? "line-through" : "none",
+                  flex: 1
+                }}>
+                  {item.itemText}
+                </span>
+                {isEdit && isCreator && (
+                  <button
+                    onClick={() => handleDeleteChecklistItem(item.id)}
+                    style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "16px", padding: "0 5px" }}
+                    title="Delete Item"
+                  >
+                    &times;
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ADD CHECKLIST ITEM (EDIT MODE ONLY) */}
+        {isEdit && isCreator && (
+          <div style={{ marginTop: "10px", borderTop: "1px solid #e2e8f0", paddingTop: "10px" }}>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <input
+                placeholder="Add new checklist item..."
+                value={newChecklistItem}
+                onChange={e => setNewChecklistItem(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleAddNewChecklistItem();
+                }}
+              />
+              <button className="btn-secondary" onClick={handleAddNewChecklistItem}>Add</button>
+            </div>
+          </div>
+        )}
+
         {/* ACTIONS */}
         <div className="task-details-actions">
           <button
             className="btn-primary"
             onClick={handleStatusClick}
-            disabled={status === "COMPLETED"}
+            disabled={status === "COMPLETED" && !isCreator}
           >
             {status === "PENDING"
               ? "Start"
               : status === "IN_PROGRESS"
                 ? "Complete"
-                : "Completed"}
+                : status === "COMPLETED" && isCreator
+                  ? "Resume"
+                  : "Completed"}
           </button>
 
           <button
             className="btn-secondary"
             onClick={handleAddTime}
             style={{ marginLeft: 10 }}
+            disabled={status === "COMPLETED"}
           >
             ➕ Add Time
           </button>
@@ -293,6 +440,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
               <th>End</th>
               <th>Minutes</th>
               <th>Comment</th>
+              <th>User</th>
               <th></th>
             </tr>
           </thead>
@@ -303,6 +451,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
                 <td>{t.endTime}</td>
                 <td>{t.durationMinutes}</td>
                 <td>{t.comment}</td>
+                <td>{t.empName || "Unknown"}</td>
                 <td></td>
               </tr>
             ))}
@@ -335,6 +484,9 @@ function TaskDetails({ task, onClose, onStatusChange }) {
                       setNewEntry({ ...newEntry, comment: e.target.value })
                     }
                   />
+                </td>
+                <td>
+                  {user?.employee_name || "Myself"}
                 </td>
                 <td>
                   <button

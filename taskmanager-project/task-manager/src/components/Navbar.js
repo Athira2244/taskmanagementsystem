@@ -5,11 +5,10 @@ function Navbar({ onProfileClick }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const employeeName = user?.employee_name || "Employee";
-
   // Set profile image with fallback
   const profileImage =
     user?.profile_pic && user.profile_pic !== ""
-      ? user.profile_pic
+      ? `https://v1.mypayrollmaster.online/${user.profile_pic}`
       : "/istockphoto-2132177453-170667a.jpg"; // image in public folder
 
   return (

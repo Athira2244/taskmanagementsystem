@@ -77,6 +77,19 @@ function Feed() {
     fetchEmployees();
   }, [user]); // ✅ dependency
 
+  // Handle outside clicks for dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showDropdown && !event.target.closest('.add-recipient-wrapper')) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
 
   // Add recipient
   const addRecipient = (emp) => {
@@ -279,7 +292,7 @@ function Feed() {
               setSelectedRecipients([{ id: "all", name: "All employees" }]);
             }}
           >
-            Cancel
+            Clear
           </button>
         </div>
       </div>
