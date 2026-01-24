@@ -14,6 +14,9 @@ public class Task {
     @Column(name = "task_id")
     private Long id;
 
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
     private String status;
     
     @Column(name = "attachment")
@@ -56,6 +59,9 @@ public class Task {
 
     // getters & setters
     public Long getId() { return id; }
+    
+    public LocalDateTime getCreatedDate() { return createdDate; }
+    public void setCreatedDate(LocalDateTime createdDate) { this.createdDate = createdDate; }
 
     public String getTaskName() { return taskName; }
     public void setTaskName(String taskName) { this.taskName = taskName; }

@@ -1,20 +1,88 @@
--- Disable safe update mode temporarily
-SET SQL_SAFE_UPDATES = 0;
+CREATE TABLE checklist_templates (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    created_by INT
+);
 
--- Fix existing NULL or empty comments in emp_task_time table
-UPDATE emp_task_time 
-SET comment = 'No comment' 
-WHERE comment IS NULL OR comment = '';
+CREATE TABLE checklist_template_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    template_id BIGINT,
+    item_text TEXT,
+    FOREIGN KEY (template_id) REFERENCES checklist_templates(id) ON DELETE CASCADE
+);
 
--- Add assignee_name column to task_assignees table
-ALTER TABLE task_assignees 
-ADD COLUMN IF NOT EXISTS assignee_name VARCHAR(255) AFTER assignee_id;
+CREATE TABLE emp_task_time (
+    time_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_fkey INT,
+    task_fkey INT,
+    start_time DATETIME,
+    end_time DATETIME,
+    duration_minutes INT,
+    created_date TIMESTAMP,
+    comment VARCHAR(255),
+    emp_name VARCHAR(255)
+);
 
--- Optional: Update existing records with assignee names from tasks table
-UPDATE task_assignees ta
-INNER JOIN tasks t ON ta.task_id = t.task_id
-SET ta.assignee_name = t.EmpName
-WHERE ta.assignee_name IS NULL;
+CREATE TABLE employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255),
+    email VARCHAR(255),
+    password VARCHAR(255)
+);
 
--- Re-enable safe update mode
-SET SQL_SAFE_UPDATES = 1;
+CREATE TABLE feed_recipients (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    feed_id INT,
+    emp_fkey INT,
+    is_read BIT(1),
+    read_at DATETIME
+);
+
+CREATE TABLE feeds (
+    feed_id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT,
+    message TEXT,
+    is_global BIT(1),
+    is_announcement INT,
+    created_at DATETIME
+);
+
+CREATE TABLE task_assignees (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    task_id BIGINT,
+    assignee_id BIGINT,
+    status VARCHAR(20),
+    is_assignee INT,
+    assignee_name VARCHAR(255),
+    assigned_at TIMESTAMP,
+    created_at DATETIME(6),
+    pending_date DATETIME,
+    in_progress_date DATETIME,
+    completed_date DATETIME
+);
+
+CREATE TABLE task_checklist_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    task_id BIGINT,
+    item_text VARCHAR(255),
+    is_completed TINYINT(1)
+);
+
+CREATE TABLE tasks (
+    task_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    task_name VARCHAR(255),
+    description VARCHAR(255),
+    assignee_id INT,
+    created_by INT,
+    EmpName VARCHAR(255),
+    deadline DATETIME,
+    created_by_name VARCHAR(255),
+    created_date TIMESTAMP,
+    status VARCHAR(255),
+    attachment VARCHAR(255),
+    emp_name VARCHAR(255),
+    is_assignee INT,
+    pending_date DATETIME,
+    in_progress_date DATETIME,
+    completed_date DATETIME
+);
