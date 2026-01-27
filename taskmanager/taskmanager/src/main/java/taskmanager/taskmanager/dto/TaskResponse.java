@@ -26,7 +26,7 @@ public class TaskResponse {
     private LocalDateTime deadline;
     
     @JsonProperty("status")
-    private String status;
+    private Integer status;
     
     @JsonProperty("attachment")
     private String attachment;
@@ -112,11 +112,11 @@ public class TaskResponse {
         this.deadline = deadline;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

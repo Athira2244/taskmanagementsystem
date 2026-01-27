@@ -13,6 +13,8 @@ function TaskDetails({ task, onClose, onStatusChange }) {
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
 
 
+  const [statuses, setStatuses] = useState([]);
+
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser?.user_id) return;
@@ -32,6 +34,12 @@ function TaskDetails({ task, onClose, onStatusChange }) {
         console.error("Failed to load employees", err);
         setEmployees([]);
       });
+
+    // Fetch Statuses
+    fetch("http://localhost:8080/api/statuses")
+      .then(res => res.json())
+      .then(data => setStatuses(data))
+      .catch(err => console.error("Failed to load statuses", err));
 
     // Load checklist templates
     if (storedUser?.emp_pkey) {
@@ -145,13 +153,9 @@ function TaskDetails({ task, onClose, onStatusChange }) {
     setTimeEntries(Array.isArray(data) ? data : []);
   };
 
-  /* -------- STATUS -------- */
-  const handleStatusClick = async () => {
-    let newStatus;
-    if (status === "PENDING") newStatus = "IN_PROGRESS";
-    else if (status === "IN_PROGRESS") newStatus = "COMPLETED";
-    else if (status === "COMPLETED" && isCreator) newStatus = "IN_PROGRESS";
-    else return;
+  /* -------- STATUS CHANGE -------- */
+  const handleStatusChangeRaw = async (e) => {
+    const newStatus = Number(e.target.value);
 
     // Use taskId (parent task ID) for status updates
     const taskIdToUpdate = task.taskId || task.id;
@@ -335,7 +339,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
 
           <label>Status</label>
           <span className={`task-status status-${status}`}>
-            {status.replace("_", " ")}
+            {statuses.find(s => s.id === status)?.statusName?.replace("_", " ") || status}
           </span>
 
           <label>Description</label>
@@ -408,19 +412,15 @@ function TaskDetails({ task, onClose, onStatusChange }) {
 
         {/* ACTIONS */}
         <div className="task-details-actions">
-          <button
-            className="btn-primary"
-            onClick={handleStatusClick}
-            disabled={status === "COMPLETED" && !isCreator}
+          <select
+            value={status}
+            onChange={handleStatusChangeRaw}
+            style={{ padding: "8px", borderRadius: "4px", border: "1px solid #cbd5e1", marginRight: "10px" }}
           >
-            {status === "PENDING"
-              ? "Start"
-              : status === "IN_PROGRESS"
-                ? "Complete"
-                : status === "COMPLETED" && isCreator
-                  ? "Resume"
-                  : "Completed"}
-          </button>
+            {statuses.map(s => (
+              <option key={s.id} value={s.id}>{s.statusName}</option>
+            ))}
+          </select>
 
           <button
             className="btn-secondary"

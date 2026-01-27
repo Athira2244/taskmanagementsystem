@@ -17,7 +17,7 @@ public class Task {
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
-    private String status;
+    private Integer status;
     
     @Column(name = "attachment")
     private String attachment;
@@ -94,8 +94,8 @@ public class Task {
     // public void setAssignee(Employee assignee) { this.assignee = assignee; }
     
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
 
     public Integer getAssigneeId() {
         return assigneeId;

@@ -11,7 +11,7 @@ public class TaskReportDTO {
     private LocalDateTime createdDate; // Pending Date (Creation)
     private LocalDateTime inProgressDate;
     private LocalDateTime completedDate;
-    private String status;
+    private Integer status;
 
     // Constructors
     public TaskReportDTO() {}
@@ -41,6 +41,6 @@ public class TaskReportDTO {
     public LocalDateTime getCompletedDate() { return completedDate; }
     public void setCompletedDate(LocalDateTime completedDate) { this.completedDate = completedDate; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
 }

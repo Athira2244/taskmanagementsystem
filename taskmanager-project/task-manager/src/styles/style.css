@@ -529,17 +529,20 @@ select:focus {
   text-transform: uppercase;
 }
 
-.status-PENDING {
+.status-PENDING,
+.status-0 {
   background: #fff3e0;
   color: #ef6c00;
 }
 
-.status-IN_PROGRESS {
+.status-IN_PROGRESS,
+.status-1 {
   background: #e1f5fe;
   color: #0288d1;
 }
 
-.status-COMPLETED {
+.status-COMPLETED,
+.status-2 {
   background: #f1f8e9;
   color: #689f38;
 }

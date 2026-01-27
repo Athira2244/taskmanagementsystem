@@ -16,7 +16,7 @@ public class TaskRequest {
     private String description;
 
     @JsonProperty("status")
-    private String status;
+    private Integer status;
     
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime deadline;
@@ -44,7 +44,7 @@ public class TaskRequest {
     public String getDescription() { return description; }
     public LocalDateTime getDeadline() { return deadline; }
     public Integer getAssigneeId() { return assigneeId; }
-    public String getStatus() { return status; }
+    public Integer getStatus() { return status; }
     public String getEmpName() { return empName; }
     public Integer getCreatedBy() { return createdBy; }
     public String getCreatedByName() { return createdByName; }
@@ -56,7 +56,7 @@ public class TaskRequest {
     public void setDescription(String description) { this.description = description; }
     public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
     public void setAssigneeId(Integer assigneeId) { this.assigneeId = assigneeId; }
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(Integer status) { this.status = status; }
     public void setEmpName(String empName) { this.empName = empName; }
     public void setCreatedBy(Integer createdBy) { this.createdBy = createdBy; }
     public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }

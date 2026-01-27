@@ -1,3 +1,15 @@
+-- 1. Create the new Master Table
+CREATE TABLE task_status_master (
+    id INT PRIMARY KEY,
+    status_name VARCHAR(50) NOT NULL
+);
+
+-- 2. Insert Default Statuses
+INSERT INTO task_status_master (id, status_name) VALUES 
+(0, 'PENDING'),
+(1, 'IN_PROGRESS'),
+(2, 'COMPLETED');
+
 CREATE TABLE checklist_templates (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
@@ -51,7 +63,7 @@ CREATE TABLE task_assignees (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     task_id BIGINT,
     assignee_id BIGINT,
-    status VARCHAR(20),
+    status INT,
     is_assignee INT,
     assignee_name VARCHAR(255),
     assigned_at TIMESTAMP,
@@ -78,7 +90,7 @@ CREATE TABLE tasks (
     deadline DATETIME,
     created_by_name VARCHAR(255),
     created_date TIMESTAMP,
-    status VARCHAR(255),
+    status INT,
     attachment VARCHAR(255),
     emp_name VARCHAR(255),
     is_assignee INT,

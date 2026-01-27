@@ -160,7 +160,7 @@ public class TaskAssigneeService {
         newAssignment.setTaskId(taskId);
         newAssignment.setAssigneeId(newAssigneeId);
         newAssignment.setAssigneeName(empName); // Store the assignee name
-        newAssignment.setStatus("PENDING");
+        newAssignment.setStatus(0); // 0 = PENDING
         newAssignment.setIsAssignee(1);
         newAssignment.setAssignedAt(LocalDateTime.now());
         newAssignment.setPendingDate(LocalDateTime.now()); // Set pending date for new assignment
@@ -172,7 +172,7 @@ public class TaskAssigneeService {
      * Update task status - handles both scenarios
      */
     @Transactional
-    public void updateTaskStatus(Long taskId, Integer assigneeId, String newStatus) {
+    public void updateTaskStatus(Long taskId, Integer assigneeId, Integer newStatus) {
         // Check if task is in task_assignees (has been reassigned)
         Optional<TaskAssignee> taskAssigneeOpt = taskAssigneeRepository.findByTaskIdAndIsAssignee(taskId, 1);
 
@@ -181,9 +181,9 @@ public class TaskAssigneeService {
             TaskAssignee taskAssignee = taskAssigneeOpt.get();
             taskAssignee.setStatus(newStatus);
             
-            if ("IN_PROGRESS".equals(newStatus)) {
+            if (newStatus == 1) { // IN_PROGRESS
                 taskAssignee.setInProgressDate(LocalDateTime.now());
-            } else if ("COMPLETED".equals(newStatus)) {
+            } else if (newStatus == 2) { // COMPLETED
                 taskAssignee.setCompletedDate(LocalDateTime.now());
             }
 
@@ -194,9 +194,9 @@ public class TaskAssigneeService {
                     .orElseThrow(() -> new RuntimeException("Task not found"));
             task.setStatus(newStatus);
 
-            if ("IN_PROGRESS".equals(newStatus)) {
+            if (newStatus == 1) { // IN_PROGRESS
                 task.setInProgressDate(LocalDateTime.now());
-            } else if ("COMPLETED".equals(newStatus)) {
+            } else if (newStatus == 2) { // COMPLETED
                 task.setCompletedDate(LocalDateTime.now());
             }
 

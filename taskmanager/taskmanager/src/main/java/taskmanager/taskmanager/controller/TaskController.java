@@ -46,7 +46,7 @@ public class TaskController {
         task.setTaskName(request.getTaskName());
         task.setDescription(request.getDescription());
         task.setDeadline(request.getDeadline());
-        task.setStatus("PENDING");
+        task.setStatus(0); // Default 0 = PENDING
         task.setAssigneeId(request.getAssigneeId());
         task.setEmpName(request.getEmpName());       // EmpName
         task.setCreatedBy(request.getCreatedBy());
@@ -142,18 +142,21 @@ public class TaskController {
 
     // UPDATE TASK STATUS - handles both scenarios (parent task or reassigned)
     @PutMapping("/{id}/status")
-    public Map<String, String> updateTaskStatus(
+    public Map<String, Object> updateTaskStatus(
             @PathVariable Long id,
-            @RequestBody Map<String, String> body) {
+            @RequestBody Map<String, Object> body) {
 
-        String newStatus = body.get("status");
+        Integer newStatus = body.get("status") instanceof Integer 
+            ? (Integer) body.get("status") 
+            : Integer.parseInt(body.get("status").toString());
+
         Integer assigneeId = body.get("assigneeId") != null ? 
-            Integer.parseInt(body.get("assigneeId")) : null;
+            Integer.parseInt(body.get("assigneeId").toString()) : null;
 
         // Use service to handle status update logic
         taskAssigneeService.updateTaskStatus(id, assigneeId, newStatus);
 
-        Map<String, String> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("message", "Status updated successfully");
         response.put("status", newStatus);
         return response;

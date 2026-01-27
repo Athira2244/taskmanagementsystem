@@ -20,8 +20,8 @@ public class TaskAssignee {
     @Column(name = "assignee_name", length = 255)
     private String assigneeName;
 
-    @Column(name = "status", length = 20)
-    private String status = "PENDING";
+    @Column(name = "status")
+    private Integer status = 0; // Default to 0 (PENDING)
 
     @Column(name = "is_assignee")
     private Integer isAssignee = 1;
@@ -84,11 +84,11 @@ public class TaskAssignee {
         this.assigneeName = assigneeName;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

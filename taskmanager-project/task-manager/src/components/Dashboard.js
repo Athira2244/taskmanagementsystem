@@ -10,8 +10,8 @@ function Dashboard() {
   const [user, setUser] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [filterType, setFilterType] = useState("all"); // 'all', 'assigned', 'created'
-
-
+  const [statuses, setStatuses] = useState([]);
+  const [statusMap, setStatusMap] = useState({});
 
   // const employeeName = "Athira"; // replace with dynamic value later
 
@@ -42,6 +42,18 @@ function Dashboard() {
           .catch(err => console.error("Failed to load employees", err));
       }
     }
+
+    // Fetch Statuses
+    fetch("http://localhost:8080/api/statuses")
+      .then(res => res.json())
+      .then(data => {
+        setStatuses(data);
+        const map = {};
+        data.forEach(s => map[s.id] = s.statusName);
+        setStatusMap(map);
+      })
+      .catch(err => console.error("Failed to load statuses", err));
+
   }, []);
 
   const loadTasks = () => {
@@ -92,13 +104,14 @@ function Dashboard() {
 
   console.log(assignedTasks, 'assigned');
 
-  const pendingCount = assignedTasks.filter(t => t.status === "PENDING").length;
-  const progressCount = assignedTasks.filter(t => t.status === "IN_PROGRESS").length;
-  const completedCount = assignedTasks.filter(t => t.status === "COMPLETED").length;
+  // Use Integer Status IDs: 0=PENDING, 1=IN_PROGRESS, 2=COMPLETED
+  const pendingCount = assignedTasks.filter(t => t.status === 0).length;
+  const progressCount = assignedTasks.filter(t => t.status === 1).length;
+  const completedCount = assignedTasks.filter(t => t.status === 2).length;
   const overdueCount = assignedTasks.filter(task =>
     task.deadline &&
     new Date(task.deadline) < new Date() &&
-    task.status !== "COMPLETED"
+    task.status !== 2
   ).length;
 
   return (
@@ -224,7 +237,7 @@ function Dashboard() {
               const isOverdue =
                 task.deadline &&
                 new Date(task.deadline) < new Date() &&
-                task.status !== "COMPLETED";
+                task.status !== 2; // 2 = COMPLETED
 
               return (
                 <tr
@@ -239,7 +252,11 @@ function Dashboard() {
                   <td>{task.empName || getEmployeeName(task.assigneeId)}</td>
                   <td>{task.createdByName || getEmployeeName(task.createdBy)}</td>
                   <td>{task.deadline}</td>
-                  <td>{task.status}</td>
+                  <td>
+                    <span className={`task-status status-${task.status}`}>
+                      {statusMap[task.status] ? statusMap[task.status].replace("_", " ") : task.status}
+                    </span>
+                  </td>
                 </tr>
               );
             })}
