@@ -16,12 +16,12 @@ function Sidebar({ active, onNavigate }) {
         >
           Feed
         </li>
-        <li
+        {/* <li
           className={active === "reports" ? "active" : ""}
           onClick={() => onNavigate("reports")}
         >
           Reports
-        </li>
+        </li> */}
         <li
           className={active === "settings" ? "active" : ""}
           onClick={() => onNavigate("settings")}
