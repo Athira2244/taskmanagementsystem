@@ -255,8 +255,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
             {!isEdit ? (
               <button
                 className="btn-primary"
-                onClick={() => setIsEdit(true)}
-                disabled={status === "COMPLETED" && !isCreator}
+                disabled={status === 2 && !isCreator}
               >
                 Edit
               </button>
@@ -411,26 +410,51 @@ function TaskDetails({ task, onClose, onStatusChange }) {
         )}
 
         {/* ACTIONS */}
-        <div className="task-details-actions">
-          <select
-            value={status}
-            onChange={handleStatusChangeRaw}
-            style={{ padding: "8px", borderRadius: "4px", border: "1px solid #cbd5e1", marginRight: "10px" }}
-          >
-            {statuses.map(s => (
-              <option key={s.id} value={s.id}>{s.statusName}</option>
-            ))}
-          </select>
+
+        {/* Status Actions - Buttons instead of Dropdown */}
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+
+          {/* PENDING -> START */}
+          {status === 0 && (
+            <button
+              className="btn-primary"
+              onClick={() => handleStatusChangeRaw({ target: { value: 1 } })} // reusing existing handler logic style or better yet calling API directly if refactored, but here adapting to existing handler pattern or simple wrapper
+            >
+              Start Task
+            </button>
+          )}
+
+          {/* IN_PROGRESS -> COMPLETE */}
+          {status === 1 && (
+            <button
+              className="btn-primary"
+              style={{ backgroundColor: "#10b981", borderColor: "#10b981" }}
+              onClick={() => handleStatusChangeRaw({ target: { value: 2 } })}
+            >
+              Complete
+            </button>
+          )}
+
+          {/* COMPLETED -> RESUME (Creator only) */}
+          {status === 2 && isCreator && (
+            <button
+              className="btn-secondary"
+              onClick={() => handleStatusChangeRaw({ target: { value: 0 } })}
+            >
+              ↺ Resume
+            </button>
+          )}
 
           <button
             className="btn-secondary"
             onClick={handleAddTime}
             style={{ marginLeft: 10 }}
-            disabled={status === "COMPLETED"}
+            disabled={status === 2} // 2 = COMPLETED
           >
             ➕ Add Time
           </button>
         </div>
+
 
         {/* TIME TABLE */}
         <table style={{ width: "100%", marginTop: 15 }}>
