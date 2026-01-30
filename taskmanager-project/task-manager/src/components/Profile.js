@@ -1,4 +1,6 @@
 import React from "react";
+import { SERVER_URL } from "../apiConfig";
+
 import "../styles/Profile.css";
 
 function Profile({ onBack, onLogout }) {
@@ -32,7 +34,7 @@ function Profile({ onBack, onLogout }) {
         <div className="profile-sidebar-card">
           <div className="profile-avatar-wrapper">
             <img
-              src={user?.profile_pic ? `https://v1.mypayrollmaster.online/${user.profile_pic}` : "/istockphoto-2132177453-170667a.jpg"}
+              src={user?.profile_pic ? `${SERVER_URL}/${user.profile_pic}` : "/istockphoto-2132177453-170667a.jpg"}
               alt="Profile"
               className="profile-avatar-large"
               onError={(e) => (e.target.src = "/istockphoto-2132177453-170667a.jpg")}

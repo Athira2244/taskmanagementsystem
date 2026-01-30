@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import API_BASE_URL from "../apiConfig";
+
 
 function ChecklistTemplates() {
     const [templates, setTemplates] = useState([]);
@@ -21,7 +23,7 @@ function ChecklistTemplates() {
 
     const loadTemplates = async () => {
         try {
-            const res = await fetch(`/api/checklists/templates/user/${user.emp_pkey}`);
+            const res = await fetch(`${API_BASE_URL}/checklists/templates/user/${user.emp_pkey}`);
             const data = await res.json();
             setTemplates(Array.isArray(data) ? data : []);
         } catch (e) {
@@ -52,7 +54,7 @@ function ChecklistTemplates() {
         };
 
         try {
-            await fetch("/api/checklists/templates", {
+            await fetch(`${API_BASE_URL}/checklists/templates`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -68,7 +70,7 @@ function ChecklistTemplates() {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this template?")) return;
-        await fetch(`/api/checklists/templates/${id}`, { method: "DELETE" });
+        await fetch(`${API_BASE_URL}/checklists/templates/${id}`, { method: "DELETE" });
         loadTemplates();
     };
 

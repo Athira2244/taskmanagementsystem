@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import API_BASE_URL from "../apiConfig";
+
 import { createPortal } from "react-dom";
 
 function AddTimeModal({ task, onClose, onSaved }) {
@@ -38,7 +40,7 @@ function AddTimeModal({ task, onClose, onSaved }) {
 
     try {
       const response = await fetch(
-        "/api/emp_task_time",
+        `${API_BASE_URL}/emp_task_time`,
         {
           method: "POST",
           headers: {

@@ -1,5 +1,7 @@
 
 import React from "react";
+import { SERVER_URL } from "../apiConfig";
+
 
 function Navbar({ onProfileClick }) {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -8,7 +10,7 @@ function Navbar({ onProfileClick }) {
   // Set profile image with fallback
   const profileImage =
     user?.profile_pic && user.profile_pic !== ""
-      ? `https://v1.mypayrollmaster.online/${user.profile_pic}`
+      ? `${SERVER_URL}/${user.profile_pic}`
       : "/istockphoto-2132177453-170667a.jpg"; // image in public folder
 
   return (

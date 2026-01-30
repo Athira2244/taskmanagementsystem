@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import API_BASE_URL from "../apiConfig";
+
 
 function TaskModal({ onClose, onTaskCreated }) {
   const [taskName, setTaskName] = useState("");
@@ -25,7 +27,7 @@ function TaskModal({ onClose, onTaskCreated }) {
     if (!user?.user_id) return; // ⛔ wait for logged-in user
 
     fetch(
-      `https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${user.user_id}`
+      `${API_BASE_URL}/employees_list?user_id=${user.user_id}`
     )
       .then(res => res.json())
       .then(json => {
@@ -42,7 +44,7 @@ function TaskModal({ onClose, onTaskCreated }) {
 
     // Load checklist templates
     if (user?.emp_pkey) {
-      fetch(`/api/checklists/templates/user/${user.emp_pkey}`)
+      fetch(`${API_BASE_URL}/checklists/templates/user/${user.emp_pkey}`)
         .then(res => res.json())
         .then(data => setTemplates(Array.isArray(data) ? data : []))
         .catch(err => console.error("Failed to load templates", err));
@@ -99,7 +101,7 @@ function TaskModal({ onClose, onTaskCreated }) {
     console.log("Saving Task Payload:", taskData);
 
     try {
-      const response = await fetch("/api/tasks", {
+      const response = await fetch(`${API_BASE_URL}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskData),

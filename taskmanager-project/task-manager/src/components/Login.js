@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import API_BASE_URL from "../apiConfig";
+
 import "../styles/Login.css";
 // import SHA1 from "crypto-js/sha1";
 
@@ -15,7 +17,7 @@ function Login({ onSuccess }) {
 
     try {
       const response = await fetch(
-        `https://v1.mypayrollmaster.online/api/v2qa/login?user_id=${encodeURIComponent(
+        `${API_BASE_URL}/login?user_id=${encodeURIComponent(
           username
         )}&password=${encodeURIComponent(password)}`
       );

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import TaskModal from "./TaskModal";
 import TaskDetails from "./TaskDetails";
+import API_BASE_URL from '../apiConfig';
+
 
 
 function Dashboard() {
@@ -32,7 +34,7 @@ function Dashboard() {
       const userId = user?.user_id;
 
       if (userId) {
-        fetch(`https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${userId}`)
+        fetch(`${API_BASE_URL}/employees_list?user_id=${userId}`)
           .then(res => res.json())
           .then(json => {
             if (json.success === 1) {
@@ -44,7 +46,7 @@ function Dashboard() {
     }
 
     // Fetch Statuses
-    fetch("/api/statuses")
+    fetch(`${API_BASE_URL}/statuses`)
       .then(res => res.json())
       .then(data => {
         setStatuses(data);
@@ -64,7 +66,7 @@ function Dashboard() {
 
       if (assigneeId) {
         // Use new endpoint that combines tasks created by and assigned to the user
-        fetch(`/api/tasks/user/${user.emp_pkey}`)
+        fetch(`${API_BASE_URL}/tasks/user/${user.emp_pkey}`)
           .then(res => res.json())
           .then(data => setTasks(Array.isArray(data) ? data : []))
           .catch(err => {

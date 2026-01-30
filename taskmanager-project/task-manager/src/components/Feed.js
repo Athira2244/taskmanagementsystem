@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import API_BASE_URL from "../apiConfig";
+
 import "../styles/Feed.css";
 
 function Feed() {
@@ -19,7 +21,7 @@ function Feed() {
     try {
       const empId = user.emp_pkey;
       const res = await fetch(
-        `/api/feeds/employee/${empId}`
+        `${API_BASE_URL}/feeds/employee/${empId}`
       );
       const data = await res.json();
       setFeeds(Array.isArray(data) ? data : []);
@@ -51,7 +53,7 @@ function Feed() {
     const fetchEmployees = async () => {
       try {
         const res = await fetch(
-          `https://v1.mypayrollmaster.online/api/v2qa/employees_list?user_id=${user.user_id}`
+          `${API_BASE_URL}/employees_list?user_id=${user.user_id}`
         );
 
         const json = await res.json();
@@ -134,7 +136,7 @@ function Feed() {
 
     try {
       setLoading(true);
-      const res = await fetch("/api/feeds", {
+      const res = await fetch(`${API_BASE_URL}/feeds`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -173,7 +175,7 @@ function Feed() {
 
     try {
       setAnnouncementLoading(true);
-      const res = await fetch("/api/feeds", {
+      const res = await fetch(`${API_BASE_URL}/feeds`, {
         // ... existing headers and body ...
         method: "POST",
         headers: {

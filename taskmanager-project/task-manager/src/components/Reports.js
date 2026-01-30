@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import API_BASE_URL from "../apiConfig";
+
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -14,7 +16,7 @@ function Reports() {
 
         setLoading(true);
         try {
-            const response = await fetch(`/api/tasks/report/${user.emp_pkey}`);
+            const response = await fetch(`${API_BASE_URL}/tasks/report/${user.emp_pkey}`);
             if (!response.ok) throw new Error("Failed to fetch report data");
 
             const data = await response.json();
