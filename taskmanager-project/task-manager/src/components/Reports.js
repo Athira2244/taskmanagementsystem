@@ -14,7 +14,7 @@ function Reports() {
 
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:8080/api/tasks/report/${user.emp_pkey}`);
+            const response = await fetch(`/api/tasks/report/${user.emp_pkey}`);
             if (!response.ok) throw new Error("Failed to fetch report data");
 
             const data = await response.json();

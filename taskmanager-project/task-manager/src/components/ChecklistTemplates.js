@@ -21,7 +21,7 @@ function ChecklistTemplates() {
 
     const loadTemplates = async () => {
         try {
-            const res = await fetch(`http://localhost:8080/api/checklists/templates/user/${user.emp_pkey}`);
+            const res = await fetch(`/api/checklists/templates/user/${user.emp_pkey}`);
             const data = await res.json();
             setTemplates(Array.isArray(data) ? data : []);
         } catch (e) {
@@ -52,7 +52,7 @@ function ChecklistTemplates() {
         };
 
         try {
-            await fetch("http://localhost:8080/api/checklists/templates", {
+            await fetch("/api/checklists/templates", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -68,7 +68,7 @@ function ChecklistTemplates() {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this template?")) return;
-        await fetch(`http://localhost:8080/api/checklists/templates/${id}`, { method: "DELETE" });
+        await fetch(`/api/checklists/templates/${id}`, { method: "DELETE" });
         loadTemplates();
     };
 

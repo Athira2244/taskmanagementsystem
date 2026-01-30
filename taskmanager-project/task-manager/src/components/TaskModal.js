@@ -42,7 +42,7 @@ function TaskModal({ onClose, onTaskCreated }) {
 
     // Load checklist templates
     if (user?.emp_pkey) {
-      fetch(`http://localhost:8080/api/checklists/templates/user/${user.emp_pkey}`)
+      fetch(`/api/checklists/templates/user/${user.emp_pkey}`)
         .then(res => res.json())
         .then(data => setTemplates(Array.isArray(data) ? data : []))
         .catch(err => console.error("Failed to load templates", err));
@@ -99,7 +99,7 @@ function TaskModal({ onClose, onTaskCreated }) {
     console.log("Saving Task Payload:", taskData);
 
     try {
-      const response = await fetch("http://localhost:8080/api/tasks", {
+      const response = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskData),
@@ -196,7 +196,7 @@ function TaskModal({ onClose, onTaskCreated }) {
               type="button"
               className="btn-secondary"
               onClick={handleAddChecklistItem}
-              style={{ minWidth: "60px",height:"40px"}}
+              style={{ minWidth: "60px", height: "40px" }}
             >
               Add
             </button>

@@ -36,14 +36,14 @@ function TaskDetails({ task, onClose, onStatusChange }) {
       });
 
     // Fetch Statuses
-    fetch("http://localhost:8080/api/statuses")
+    fetch("/api/statuses")
       .then(res => res.json())
       .then(data => setStatuses(data))
       .catch(err => console.error("Failed to load statuses", err));
 
     // Load checklist templates
     if (storedUser?.emp_pkey) {
-      fetch(`http://localhost:8080/api/checklists/templates/user/${storedUser.emp_pkey}`)
+      fetch(`/api/checklists/templates/user/${storedUser.emp_pkey}`)
         .then(res => res.json())
         .then(data => setTemplates(Array.isArray(data) ? data : []))
         .catch(err => console.error("Failed to load templates", err));
@@ -96,7 +96,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
   const loadChecklistItems = async () => {
     const taskIdToFetch = task.taskId || task.id;
     try {
-      const res = await fetch(`http://localhost:8080/api/task_checklists/task/${taskIdToFetch}`);
+      const res = await fetch(`/api/task_checklists/task/${taskIdToFetch}`);
       const data = await res.json();
       setChecklistItems(Array.isArray(data) ? data : []);
     } catch (e) {
@@ -108,7 +108,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
 
   const handleToggleChecklist = async (itemId) => {
     try {
-      await fetch(`http://localhost:8080/api/task_checklists/${itemId}/toggle`, { method: "PUT" });
+      await fetch(`/api/task_checklists/${itemId}/toggle`, { method: "PUT" });
       loadChecklistItems();
     } catch (e) {
       console.error("Toggle failed", e);
@@ -118,7 +118,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
   const handleAddNewChecklistItem = async () => {
     if (!newChecklistItem.trim()) return;
     try {
-      await fetch("http://localhost:8080/api/task_checklists", {
+      await fetch("/api/task_checklists", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -137,7 +137,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
   const handleDeleteChecklistItem = async (itemId) => {
     if (!window.confirm("Delete this checklist item?")) return;
     try {
-      await fetch(`http://localhost:8080/api/task_checklists/${itemId}`, { method: "DELETE" });
+      await fetch(`/api/task_checklists/${itemId}`, { method: "DELETE" });
       loadChecklistItems();
     } catch (e) {
       console.error("Failed to delete item", e);
@@ -147,7 +147,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
   const loadTimeEntries = async () => {
     const taskIdToFetch = task.taskId || task.id;
     const res = await fetch(
-      `http://localhost:8080/api/emp_task_time/task/${taskIdToFetch}`
+      `/api/emp_task_time/task/${taskIdToFetch}`
     );
     const data = await res.json();
     setTimeEntries(Array.isArray(data) ? data : []);
@@ -160,7 +160,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
     // Use taskId (parent task ID) for status updates
     const taskIdToUpdate = task.taskId || task.id;
 
-    await fetch(`http://localhost:8080/api/tasks/${taskIdToUpdate}/status`, {
+    await fetch(`/api/tasks/${taskIdToUpdate}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -191,7 +191,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
       console.log('Employee name to send:', empName);
 
       // We always send the full object to ensure names are persisted correctly
-      await fetch(`http://localhost:8080/api/tasks/${taskIdToUpdate}`, {
+      await fetch(`/api/tasks/${taskIdToUpdate}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -226,7 +226,7 @@ function TaskDetails({ task, onClose, onStatusChange }) {
   const saveTime = async () => {
     const taskIdToSave = task.taskId || task.id;
 
-    await fetch("http://localhost:8080/api/emp_task_time", {
+    await fetch("/api/emp_task_time", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

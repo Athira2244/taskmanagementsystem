@@ -4,10 +4,10 @@ import { createPortal } from "react-dom";
 function AddTimeModal({ task, onClose, onSaved }) {
   // const getNow = () => new Date().toISOString().slice(0, 16);
   const getNow = () => {
-  const d = new Date();
-  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-  return d.toISOString().slice(0, 16);
-};
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
+  };
 
 
   const [startTime, setStartTime] = useState(getNow());
@@ -21,46 +21,46 @@ function AddTimeModal({ task, onClose, onSaved }) {
     setDuration(diff > 0 ? diff : 0);
   }, [startTime, endTime]);
 
- const saveTime = async () => {
-  if (duration <= 0) {
-    alert("End time must be after start time");
-    return;
-  }
-
-  const payload = {
-    empFkey: task.assignee.employeeId,
-    taskFkey: task.id,
-    startTime: startTime,       // "yyyy-MM-ddTHH:mm"
-    endTime: endTime,
-    durationMinutes: duration
-  };
-
-
-  try {
-    const response = await fetch(
-      "http://localhost:8080/api/emp_task_time",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      }
-    );
-
-    console.log(response,'response');
-
-    if (!response.ok) {
-      throw new Error("Save failed");
+  const saveTime = async () => {
+    if (duration <= 0) {
+      alert("End time must be after start time");
+      return;
     }
 
-    onSaved();
-    onClose();
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save time entry");
-  }
-};
+    const payload = {
+      empFkey: task.assignee.employeeId,
+      taskFkey: task.id,
+      startTime: startTime,       // "yyyy-MM-ddTHH:mm"
+      endTime: endTime,
+      durationMinutes: duration
+    };
+
+
+    try {
+      const response = await fetch(
+        "/api/emp_task_time",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      console.log(response, 'response');
+
+      if (!response.ok) {
+        throw new Error("Save failed");
+      }
+
+      onSaved();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save time entry");
+    }
+  };
 
 
   return createPortal(

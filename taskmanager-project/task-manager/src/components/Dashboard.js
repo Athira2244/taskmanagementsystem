@@ -44,7 +44,7 @@ function Dashboard() {
     }
 
     // Fetch Statuses
-    fetch("http://localhost:8080/api/statuses")
+    fetch("/api/statuses")
       .then(res => res.json())
       .then(data => {
         setStatuses(data);
@@ -64,7 +64,7 @@ function Dashboard() {
 
       if (assigneeId) {
         // Use new endpoint that combines tasks created by and assigned to the user
-        fetch(`http://localhost:8080/api/tasks/user/${user.emp_pkey}`)
+        fetch(`/api/tasks/user/${user.emp_pkey}`)
           .then(res => res.json())
           .then(data => setTasks(Array.isArray(data) ? data : []))
           .catch(err => {

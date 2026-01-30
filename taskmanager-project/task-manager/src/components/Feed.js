@@ -19,7 +19,7 @@ function Feed() {
     try {
       const empId = user.emp_pkey;
       const res = await fetch(
-        `http://localhost:8080/api/feeds/employee/${empId}`
+        `/api/feeds/employee/${empId}`
       );
       const data = await res.json();
       setFeeds(Array.isArray(data) ? data : []);
@@ -134,7 +134,7 @@ function Feed() {
 
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:8080/api/feeds", {
+      const res = await fetch("/api/feeds", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -173,7 +173,7 @@ function Feed() {
 
     try {
       setAnnouncementLoading(true);
-      const res = await fetch("http://localhost:8080/api/feeds", {
+      const res = await fetch("/api/feeds", {
         // ... existing headers and body ...
         method: "POST",
         headers: {
