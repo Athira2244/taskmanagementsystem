@@ -1,0 +1,376 @@
+/* Global Font & Reset */
+* {
+    box-sizing: border-box;
+}
+
+/* Container */
+.chat-container {
+    display: flex;
+    height: 92%;
+    /* Fill available space */
+    background-color: #fff;
+    overflow: hidden;
+}
+
+/* ================= Sidebar ================= */
+.chat-sidebar {
+    width: 320px;
+    /* Specific width similar to Messages.app */
+    min-width: 300px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid #d1d1d6;
+    /* Light gray separator */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sidebar Header */
+.chat-sidebar-header {
+    padding: 10px 16px 10px 16px;
+    /* Compact */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* border-bottom: 1px solid #e5e5ea; Optional */
+}
+
+/* Search Bar */
+.chat-search-container {
+    padding: 10px 12px;
+}
+
+.chat-search {
+    width: 100%;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #e3e3e8;
+    /* Search bar gray */
+    outline: none;
+    font-size: 13px;
+    color: #000;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+.chat-search::placeholder {
+    color: #8e8e93;
+    text-align: center;
+}
+
+.chat-search:focus {
+    background-color: #d1d1d6;
+    text-align: left;
+}
+
+.chat-search:focus::placeholder {
+    text-align: left;
+}
+
+/* Contact List */
+.contact-list {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    /* Critical for nested flex scrolling */
+}
+
+/* Contact Item */
+.contact-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    position: relative;
+}
+
+.contact-item:hover {
+    background-color: #f5f5f5;
+}
+
+.contact-item.active {
+    background-color: #007aff;
+    /* Active Blue */
+    color: #fff;
+}
+
+.contact-item.active .contact-name {
+    color: #fff;
+}
+
+.contact-item.active .last-message {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #999;
+    /* Fallback gray */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 12px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+/* Generate random-looking gradients for avatars based on name? Or keep simple gray/initials style */
+.avatar {
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    color: #333;
+}
+
+.contact-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.contact-name-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.contact-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.last-message {
+    font-size: 13px;
+    color: #8e8e93;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.badge {
+    background-color: #007aff;
+    /* Unread Blue */
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: auto;
+}
+
+/* ================= Main Chat Window ================= */
+.chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f9fafb;
+    transition: border 0.2s;
+    flex-shrink: 0;
+    /* Prevent input from shrinking */
+}
+
+/* Header */
+.chat-header {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Center Name like iMessage */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    z-index: 10;
+    flex-shrink: 0;
+    /* Prevent header from shrinking */
+    font-weight: 600;
+    font-size: 14px;
+    color: #000;
+}
+
+.chat-header .recipient-name {
+    color: #000;
+}
+
+/* Messages Area */
+.chat-messages {
+    flex: 1;
+    padding: 24px 60px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    /* Critical for nested flex scrolling */
+    /* Small gap for consecutive messages */
+}
+
+/* Message Bubble Base */
+.chat-message {
+    max-width: 70%;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.4;
+    position: relative;
+    margin-bottom: 8px;
+    /* Space between message groups */
+    word-wrap: break-word;
+}
+
+/* Sent Message (Blue) */
+.chat-message.me {
+    align-self: flex-end;
+    background-color: #007aff;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+    /* Tail effect approximation */
+}
+
+/* Received Message (Gray) */
+.chat-message.them {
+    align-self: flex-start;
+    background-color: #e5e5ea;
+    color: #000;
+    border-bottom-left-radius: 4px;
+    /* Tail effect approximation */
+}
+
+/* Metadata (Time / Read Status) */
+.message-meta {
+    font-size: 11px;
+    margin-top: 2px;
+    text-align: right;
+    opacity: 0.7;
+    display: none;
+}
+
+.chat-message:hover .message-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 4px;
+    opacity: 0.8;
+}
+
+.chat-message.me .message-meta {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.chat-message.them .message-meta {
+    color: #8e8e93;
+}
+
+.message-status {
+    margin-left: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.message-status.READ {
+    color: #55f261;
+}
+
+
+/* Delivered Text */
+.status-text {
+    font-size: 10px;
+    color: #8e8e93;
+    text-align: right;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-top: -5px;
+}
+
+/* Input Area */
+.chat-input {
+    padding: 10px 20px;
+    background-color: #f6f6f6;
+    /* Bottom gray area */
+    border-top: 1px solid #d1d1d6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 8px 14px;
+    border-radius: 18px;
+    border: 1px solid #d1d1d6;
+    background-color: #fff;
+    font-size: 15px;
+    outline: none;
+}
+
+.chat-input input:focus {
+    border-color: #bcbcc0;
+}
+
+
+.send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #007aff;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+    padding-left: 4px;
+    /* Optical center for the arrow icon */
+    flex-shrink: 0;
+}
+
+.send-btn:hover:not(:disabled) {
+    background: #0062cc;
+    transform: scale(1.05);
+}
+
+.send-btn:disabled {
+    background: #ceced2;
+    cursor: default;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Scrollbar Styling */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* Placeholder */
+.chat-placeholder {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8e8e93;
+    font-size: 1.2rem;
+}

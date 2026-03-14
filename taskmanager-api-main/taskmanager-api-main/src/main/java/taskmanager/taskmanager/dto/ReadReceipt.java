@@ -1,0 +1,39 @@
+package taskmanager.taskmanager.dto;
+
+public class ReadReceipt {
+    private Long messageId;
+    private String sender;
+    private String receiver;
+
+    public ReadReceipt() {}
+
+    public ReadReceipt(Long messageId, String sender, String receiver) {
+        this.messageId = messageId;
+        this.sender = sender;
+        this.receiver = receiver;
+    }
+
+    public Long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(Long messageId) {
+        this.messageId = messageId;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
+    }
+}
